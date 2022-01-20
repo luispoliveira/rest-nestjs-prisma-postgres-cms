@@ -1,0 +1,212 @@
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  NotFoundException,
+  OnModuleInit,
+} from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
+import { Prisma, User } from '@prisma/client';
+import { ConfigService } from '@nestjs/config';
+import { PasswordUtil } from 'src/utils/password.util';
+import { RoleEnum } from 'src/roles/enums/role.enum';
+
+@Injectable()
+export class UsersService implements OnModuleInit {
+  private readonly defaultAdmin: {
+    email: string;
+    username: string;
+    password: string;
+  };
+
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly config: ConfigService,
+  ) {
+    this.defaultAdmin = this.config.get('admin');
+
+    /**
+     * middlewares para hashar a password
+     */
+    this.prisma.$use(
+      async (
+        params: Prisma.MiddlewareParams,
+        next: (params: Prisma.MiddlewareParams) => Promise<User>,
+      ) => {
+        if (params.model === Prisma.ModelName.User) {
+          if (params.action === 'create') {
+            params.args.data.password = await PasswordUtil.hash(
+              params.args.data.password,
+            );
+            const result = await next(params);
+            return result;
+          }
+          if (params.action === 'update' && params.args.data.password) {
+            params.args.data.password = await PasswordUtil.hash(
+              params.args.data.password,
+            );
+            const result = await next(params);
+            return result;
+          }
+        }
+        return next(params);
+      },
+    );
+  }
+
+  async onModuleInit() {
+    await this.ensureAdmin();
+  }
+
+  private async ensureAdmin() {
+    try {
+      const user = await this.findOne({ username: this.defaultAdmin.username });
+      Logger.log(
+        `Admin: ${user.username}; Email:${user.email}`,
+        UsersService.name,
+      );
+    } catch (e) {
+      const createdUser = await this.create({
+        username: this.defaultAdmin.username,
+        email: this.defaultAdmin.email,
+        password: this.defaultAdmin.password,
+        isActive: true,
+        createdBy: 'admin',
+        updatedBy: 'admin',
+        roles: {
+          create: {
+            role: {
+              connect: {
+                name: RoleEnum.Admin,
+              },
+            },
+          },
+        },
+      });
+
+      Logger.log(
+        `Admin user created: ${createdUser.username}`,
+        UsersService.name,
+      );
+    }
+  }
+
+  async create(data: Prisma.UserCreateInput): Promise<User> {
+    try {
+      const user = await this.prisma.user.create({
+        data: data,
+        include: {
+          roles: {
+            include: {
+              role: true,
+            },
+          },
+          permissions: {
+            include: {
+              permission: true,
+            },
+          },
+        },
+      });
+      return user;
+    } catch (e) {
+      Logger.error(e, UsersService.name);
+      throw new BadRequestException(e);
+    }
+  }
+
+  async findAll(params: {
+    skip?: number;
+    take?: number;
+    cursor?: Prisma.UserWhereUniqueInput;
+    where?: Prisma.UserWhereInput;
+    orderBy?: Prisma.UserOrderByWithRelationInput;
+  }): Promise<User[]> {
+    const { skip, take, cursor, where, orderBy } = params;
+
+    return await this.prisma.user.findMany({
+      skip: skip,
+      take: take,
+      cursor: cursor,
+      where: where,
+      orderBy: orderBy,
+      include: {
+        roles: {
+          include: {
+            role: true,
+          },
+        },
+        permissions: {
+          include: {
+            permission: true,
+          },
+        },
+      },
+    });
+  }
+
+  async findOne(userWhereUniqueInput: Prisma.UserWhereUniqueInput) {
+    const user = await this.prisma.user.findUnique({
+      where: userWhereUniqueInput,
+      include: {
+        roles: {
+          include: {
+            role: true,
+          },
+        },
+        permissions: {
+          include: {
+            permission: true,
+          },
+        },
+      },
+      rejectOnNotFound: (err: Error) => {
+        Logger.error(err, UsersService.name);
+        return new NotFoundException('User not found');
+      },
+    });
+    // if (!user) throw new NotFoundException("User not Found");
+
+    return user;
+  }
+
+  async update(params: {
+    where: Prisma.UserWhereUniqueInput;
+    data: Prisma.UserUpdateInput;
+  }): Promise<User> {
+    const { data, where } = params;
+
+    try {
+      return await this.prisma.user.update({
+        data: data,
+        where: where,
+        include: {
+          roles: {
+            include: {
+              role: true,
+            },
+          },
+          permissions: {
+            include: {
+              permission: true,
+            },
+          },
+        },
+      });
+    } catch (e) {
+      Logger.error(e, UsersService.name);
+      throw new BadRequestException(e);
+    }
+  }
+
+  async remove(where: Prisma.UserWhereUniqueInput): Promise<User> {
+    try {
+      return await this.prisma.user.delete({
+        where: where,
+      });
+    } catch (e) {
+      Logger.error(e, UsersService.name);
+      throw new BadRequestException(e);
+    }
+  }
+}

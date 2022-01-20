@@ -1,0 +1,110 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+generator nestjsDto {
+  provider                        = "prisma-generator-nestjs-dto"
+  output                          = "../src/generated/nestjs-dto"
+  outputToNestJsResourceStructure = "false"
+  exportRelationModifierClasses   = "true"
+  reExport                        = "false"
+  createDtoPrefix                 = "Create"
+  updateDtoPrefix                 = "Update"
+  dtoSuffix                       = "Dto"
+  entityPrefix                    = ""
+  entitySuffix                    = ""
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                   Int                 @id @default(autoincrement())
+  username             String              @unique
+  email                String              @unique
+  password             String
+  isActive             Boolean             @default(false)
+  resetPasswordToken   String?             @unique
+  resetPasswordExpires DateTime?
+  roles                Roles2Users[]
+  permissions          Permissions2Users[]
+  createdAt            DateTime            @default(now())
+  updatedAt            DateTime            @updatedAt
+  createdBy            String?
+  updatedBy            String?
+
+  @@map("user")
+}
+
+model Role {
+  id          Int                 @id @default(autoincrement())
+  name        String              @unique
+  users       Roles2Users[]
+  permissions Permissions2Roles[]
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+  createdBy   String?
+  updatedBy   String?
+
+  @@map("role")
+}
+
+model Permission {
+  id        Int                 @id @default(autoincrement())
+  name      String              @unique
+  users     Permissions2Users[]
+  roles     Permissions2Roles[]
+  createdAt DateTime            @default(now())
+  updatedAt DateTime            @updatedAt
+  createdBy String?
+  updatedBy String?
+
+  @@map("permission")
+}
+
+model Roles2Users {
+  role      Role     @relation(fields: [roleId], references: [id])
+  roleId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  createdBy String?
+  updatedBy String?
+
+  @@id([roleId, userId])
+  @@map("role2user")
+}
+
+model Permissions2Users {
+  permission   Permission @relation(fields: [permissionId], references: [id])
+  permissionId Int
+  user         User       @relation(fields: [userId], references: [id])
+  userId       Int
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  createdBy    String?
+  updatedBy    String?
+
+  @@id([permissionId, userId])
+  @@map("permission2user")
+}
+
+model Permissions2Roles {
+  permission   Permission @relation(fields: [permissionId], references: [id])
+  permissionId Int
+  role         Role       @relation(fields: [roleId], references: [id])
+  roleId       Int
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  createdBy    String?
+  updatedBy    String?
+
+  @@id([permissionId, roleId])
+  @@map("permission2role")
+}
