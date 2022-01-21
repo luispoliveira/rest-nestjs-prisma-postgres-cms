@@ -1,34 +1,56 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+  ParseIntPipe,
+} from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
+import { Permission } from 'src/generated/nestjs-dto/permission.entity';
+import { FindPermissionDto } from './dtos/find-permission.dto';
 import { PermissionsService } from './permissions.service';
-import { CreatePermissionDto } from './dto/create-permission.dto';
-import { UpdatePermissionDto } from './dto/update-permission.dto';
 
+@ApiTags('Permissions')
+@ApiBearerAuth()
+@ApiUnauthorizedResponse()
 @Controller('permissions')
 export class PermissionsController {
   constructor(private readonly permissionsService: PermissionsService) {}
 
-  // @Post()
-  // create(@Body() createPermissionDto: CreatePermissionDto) {
-  //   return this.permissionsService.create(createPermissionDto);
-  // }
+  @ApiOkResponse({ type: Permission, isArray: true })
+  @Get()
+  findAll(@Query() findPermissionDto: FindPermissionDto) {
+    const { page, limit, orderDirection, orderField, ...findPermission } =
+      findPermissionDto;
+    const skip = (findPermissionDto.page - 1) * findPermissionDto.limit;
+    return this.permissionsService.findAll({
+      skip: +skip,
+      take: +limit,
+      where: {
+        ...findPermission,
+      },
+      orderBy: {
+        [findPermissionDto.orderField]: findPermissionDto.orderDirection,
+      },
+    });
+  }
 
-  // @Get()
-  // findAll() {
-  //   return this.permissionsService.findAll();
-  // }
-
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.permissionsService.findOne(+id);
-  // }
-
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updatePermissionDto: UpdatePermissionDto) {
-  //   return this.permissionsService.update(+id, updatePermissionDto);
-  // }
-
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.permissionsService.remove(+id);
-  // }
+  @ApiOkResponse({ type: Permission, isArray: false })
+  @ApiNotFoundResponse()
+  @Get(':id')
+  finOne(@Param('id', ParseIntPipe) id: number) {
+    return this.permissionsService.findOne({
+      id: id,
+    });
+  }
 }

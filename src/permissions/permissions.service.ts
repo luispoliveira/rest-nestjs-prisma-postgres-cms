@@ -9,8 +9,6 @@ import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { RoleEnum } from 'src/roles/enums/role.enum';
 import { DefaultPermissionData } from './data/default-permission.data';
-import { CreatePermissionDto } from './dto/create-permission.dto';
-import { UpdatePermissionDto } from './dto/update-permission.dto';
 
 @Injectable()
 export class PermissionsService implements OnModuleInit {
@@ -76,9 +74,9 @@ export class PermissionsService implements OnModuleInit {
   async findAll(params: {
     skip?: number;
     take?: number;
-    cursor: Prisma.PermissionWhereUniqueInput;
-    where: Prisma.PermissionWhereInput;
-    orderBy: Prisma.PermissionOrderByWithRelationInput;
+    cursor?: Prisma.PermissionWhereUniqueInput;
+    where?: Prisma.PermissionWhereInput;
+    orderBy?: Prisma.PermissionOrderByWithRelationInput;
   }) {
     const { skip, take, cursor, where, orderBy } = params;
 
