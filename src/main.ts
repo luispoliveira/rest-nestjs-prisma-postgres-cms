@@ -32,6 +32,7 @@ async function bootstrap() {
   app.setGlobalPrefix(globalPrefix);
   await app.listen(port, () => {
     Logger.log(`Listening at http://localhost:${port}/${globalPrefix}`);
+    Logger.log(`GraphQL at http://localhost:${port}/graphql`);
     // Logger.log(`Api Doc: http://localhost:${port}/${globalPrefix}/api-docs`);
     Logger.log(`Running in ${config.get('environment')} mode`);
   });

@@ -1,56 +1,57 @@
 import {
   Controller,
   Get,
-  Post,
-  Body,
-  Patch,
   Param,
-  Delete,
   Query,
-  ParseIntPipe,
-} from '@nestjs/common';
+  ParseIntPipe
+} from "@nestjs/common";
 import {
   ApiBearerAuth,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiTags,
-  ApiUnauthorizedResponse,
-} from '@nestjs/swagger';
-import { Permission } from 'src/generated/nestjs-dto/permission.entity';
-import { FindPermissionDto } from './dtos/find-permission.dto';
-import { PermissionsService } from './permissions.service';
+  ApiUnauthorizedResponse
+} from "@nestjs/swagger";
+import { Permission } from "src/generated/nestjs-dto/permission.entity";
+import { FindPermissionDto } from "../common/dtos/permissions/find-permission.dto";
+import { PermissionsService } from "./permissions.service";
+import { PaginationDto } from "../common/dtos/pagination.dto";
+import { OrderDto } from "../common/dtos/order.dto";
+import { BaseController } from "../common/controllers/base.controller";
 
-@ApiTags('Permissions')
+@ApiTags("Permissions")
 @ApiBearerAuth()
 @ApiUnauthorizedResponse()
-@Controller('permissions')
-export class PermissionsController {
-  constructor(private readonly permissionsService: PermissionsService) {}
+@Controller("permissions")
+export class PermissionsController extends BaseController{
+  constructor(private readonly permissionsService: PermissionsService) {
+    super();
+  }
 
   @ApiOkResponse({ type: Permission, isArray: true })
   @Get()
-  findAll(@Query() findPermissionDto: FindPermissionDto) {
-    const { page, limit, orderDirection, orderField, ...findPermission } =
+  findAll(@Query() findPermissionDto: FindPermissionDto, @Query() paginationDto: PaginationDto, @Query() orderDto: OrderDto) {
+    const { page, limit } = paginationDto;
+    const { orderDirection, orderField } = orderDto;
+    const { ...findPermission } =
       findPermissionDto;
-    const skip = (findPermissionDto.page - 1) * findPermissionDto.limit;
+    const skip = (page - 1) * limit;
     return this.permissionsService.findAll({
       skip: +skip,
       take: +limit,
-      where: {
-        ...findPermission,
-      },
+      where: {},
       orderBy: {
-        [findPermissionDto.orderField]: findPermissionDto.orderDirection,
-      },
+        [orderField]: orderDirection
+      }
     });
   }
 
   @ApiOkResponse({ type: Permission, isArray: false })
   @ApiNotFoundResponse()
-  @Get(':id')
-  finOne(@Param('id', ParseIntPipe) id: number) {
+  @Get(":id")
+  finOne(@Param("id", ParseIntPipe) id: number) {
     return this.permissionsService.findOne({
-      id: id,
+      id: id
     });
   }
 }

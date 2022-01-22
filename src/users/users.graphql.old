@@ -1,0 +1,11 @@
+type User {
+    id: Int!
+    username: String!
+    email: String!
+    roles: [Role]!
+    permissions: [Permission]!
+}
+
+type Query {
+    users(pagination: PaginationParams!): [User]!
+}

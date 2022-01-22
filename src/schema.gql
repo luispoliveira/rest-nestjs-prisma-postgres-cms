@@ -1,0 +1,299 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+input IntFilter {
+  equals: Int
+  gt: Int
+  gte: Int
+  in: [Int!]
+  lt: Int
+  lte: Int
+  not: NestedIntFilter
+  notIn: [Int!]
+}
+
+type Login {
+  accessToken: String!
+  userId: Int!
+  username: String!
+}
+
+input LoginInput {
+  password: String!
+  username: String!
+}
+
+type Mutation {
+  AuthLogin(loginInput: LoginInput!): Login!
+  AuthRecoverPassword(recoverInput: RecoverInput!): RecoverModel!
+  AuthResetPassword(resetInput: ResetInput!): ResetModel!
+  AuthSignUp(signUpInput: UserCreateInput!): User!
+  RoleAddPermission(permissionId: Int!, roleId: Int!): Role!
+  RoleCreateRole(roleCreateInput: RoleCreateInput!): Role!
+  RoleDeleteRole(roleId: Int!): Role!
+  RoleRemovePermission(permissionId: Int!, roleId: Int!): Role!
+  RoleUpdateRole(roleId: Int!, roleUpdateInput: RoleUpdateInput!): Role!
+  UserAddPermission(permissionsId: Int!, userId: Int!): User!
+  UserAddRole(roleId: Int!, userId: Int!): User!
+  UserCreateUser(userCreateInput: UserCreateInput!): User!
+  UserDeleteUser(userId: Int!): User!
+  UserRemovePermission(permissionsId: Int!, userId: Int!): User!
+  UserRemoveRole(roleId: Int!, userId: Int!): User!
+  UserUpdateUser(userId: Int!, userUpdateInput: UserUpdateInput!): User!
+}
+
+input NestedIntFilter {
+  equals: Int
+  gt: Int
+  gte: Int
+  in: [Int!]
+  lt: Int
+  lte: Int
+  not: NestedIntFilter
+  notIn: [Int!]
+}
+
+input NestedStringFilter {
+  contains: String
+  endsWith: String
+  equals: String
+  gt: String
+  gte: String
+  in: [String!]
+  lt: String
+  lte: String
+  not: NestedStringFilter
+  notIn: [String!]
+  startsWith: String
+}
+
+input PaginationInput {
+  limit: Int = 10
+  page: Int = 1
+}
+
+type Permission {
+  _count: PermissionCount!
+  createdAt: DateTime!
+  createdBy: String
+  id: ID!
+  name: String!
+  roles: [Permissions2Roles!]
+  updatedAt: DateTime!
+  updatedBy: String
+  users: [Permissions2Users!]
+}
+
+type PermissionCount {
+  roles: Int!
+  users: Int!
+}
+
+input PermissionOrderByWithRelationInput {
+  id: SortOrder
+  name: SortOrder
+}
+
+input PermissionWhereInput {
+  AND: [PermissionWhereInput!]
+  NOT: [PermissionWhereInput!]
+  OR: [PermissionWhereInput!]
+  id: IntFilter
+  name: StringFilter
+}
+
+input PermissionWhereUniqueInput {
+  id: Int
+  name: String
+}
+
+type Permissions2Roles {
+  createdAt: DateTime!
+  createdBy: String
+  permission: Permission!
+  permissionId: Int!
+  role: Role!
+  roleId: Int!
+  updatedAt: DateTime!
+  updatedBy: String
+}
+
+type Permissions2Users {
+  createdAt: DateTime!
+  createdBy: String
+  permission: Permission!
+  permissionId: Int!
+  updatedAt: DateTime!
+  updatedBy: String
+  user: User!
+  userId: Int!
+}
+
+type Query {
+  PermissionGetPermission(permissionWhereUnique: PermissionWhereUniqueInput!): Permission!
+  PermissionGetPermissions(orderBy: PermissionOrderByWithRelationInput, pagination: PaginationInput, permissionWhere: PermissionWhereInput): [Permission!]!
+  RoleGetRole(roleWhereUnique: RoleWhereUniqueInput!): Role!
+  RoleGetRoles(orderBy: RoleOrderByWithRelationInput, pagination: PaginationInput, roleWhere: RoleWhereInput): [Role!]!
+  UserGetUser(userWhereUnique: UserWhereUniqueInput!): User!
+  UserGetUsers(orderBy: UserOrderByWithRelationInput, pagination: PaginationInput, userWhere: UserWhereInput): [User!]!
+}
+
+enum QueryMode {
+  default
+  insensitive
+}
+
+input RecoverInput {
+  email: String!
+}
+
+type RecoverModel {
+  message: String!
+}
+
+input ResetInput {
+  password: String!
+  resetToken: String!
+}
+
+type ResetModel {
+  message: String!
+}
+
+type Role {
+  _count: RoleCount!
+  createdAt: DateTime!
+  createdBy: String
+  id: ID!
+  name: String!
+  permissions: [Permissions2Roles!]
+  updatedAt: DateTime!
+  updatedBy: String
+  users: [Roles2Users!]
+}
+
+type RoleCount {
+  permissions: Int!
+  users: Int!
+}
+
+input RoleCreateInput {
+  name: String!
+}
+
+input RoleOrderByWithRelationInput {
+  id: SortOrder
+  name: SortOrder
+}
+
+input RoleUpdateInput {
+  name: StringFieldUpdateOperationsInput
+}
+
+input RoleWhereInput {
+  AND: [RoleWhereInput!]
+  NOT: [RoleWhereInput!]
+  OR: [RoleWhereInput!]
+  id: IntFilter
+  name: StringFilter
+}
+
+input RoleWhereUniqueInput {
+  id: Int
+  name: String
+}
+
+type Roles2Users {
+  createdAt: DateTime!
+  createdBy: String
+  role: Role!
+  roleId: Int!
+  updatedAt: DateTime!
+  updatedBy: String
+  user: User!
+  userId: Int!
+}
+
+enum SortOrder {
+  asc
+  desc
+}
+
+input StringFieldUpdateOperationsInput {
+  set: String
+}
+
+input StringFilter {
+  contains: String
+  endsWith: String
+  equals: String
+  gt: String
+  gte: String
+  in: [String!]
+  lt: String
+  lte: String
+  mode: QueryMode
+  not: NestedStringFilter
+  notIn: [String!]
+  startsWith: String
+}
+
+type User {
+  _count: UserCount!
+  createdAt: DateTime!
+  createdBy: String
+  email: String!
+  id: ID!
+  isActive: Boolean!
+  permissions: [Permissions2Users!]
+  roles: [Roles2Users!]
+  updatedAt: DateTime!
+  updatedBy: String
+  username: String!
+}
+
+type UserCount {
+  permissions: Int!
+  roles: Int!
+}
+
+input UserCreateInput {
+  email: String!
+  password: String!
+  username: String!
+}
+
+input UserOrderByWithRelationInput {
+  email: SortOrder
+  id: SortOrder
+  password: SortOrder
+  username: SortOrder
+}
+
+input UserUpdateInput {
+  email: StringFieldUpdateOperationsInput
+  password: StringFieldUpdateOperationsInput
+  username: StringFieldUpdateOperationsInput
+}
+
+input UserWhereInput {
+  AND: [UserWhereInput!]
+  NOT: [UserWhereInput!]
+  OR: [UserWhereInput!]
+  email: StringFilter
+  id: IntFilter
+  password: StringFilter
+  username: StringFilter
+}
+
+input UserWhereUniqueInput {
+  email: String
+  id: Int
+  username: String
+}

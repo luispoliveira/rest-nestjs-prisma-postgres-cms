@@ -1,24 +1,20 @@
-import { Roles2Users } from './roles2Users.entity';
-import { Permissions2Users } from './permissions2Users.entity';
-import { ApiProperty } from '@nestjs/swagger';
+
+import {Roles2Users} from './roles2Users.entity'
+import {Permissions2Users} from './permissions2Users.entity'
+
 
 export class User {
-  @ApiProperty()
-  id: number;
-  @ApiProperty()
-  username: string;
-  @ApiProperty()
-  email: string;
-  @ApiProperty({ type: Roles2Users, isArray: true })
-  roles?: Roles2Users[];
-  @ApiProperty({ type: Permissions2Users, isArray: true })
-  permissions?: Permissions2Users[];
-  @ApiProperty()
-  createdAt: Date;
-  @ApiProperty()
-  updatedAt: Date;
-  @ApiProperty()
-  createdBy: string | null;
-  @ApiProperty()
-  updatedBy: string | null;
+  id: number ;
+username: string ;
+email: string ;
+password: string ;
+isActive: boolean ;
+resetPasswordToken: string  | null;
+resetPasswordExpires: Date  | null;
+roles?: Roles2Users[] ;
+permissions?: Permissions2Users[] ;
+createdAt: Date ;
+updatedAt: Date ;
+createdBy: string  | null;
+updatedBy: string  | null;
 }

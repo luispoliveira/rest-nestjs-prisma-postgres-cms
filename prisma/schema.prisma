@@ -5,6 +5,13 @@ generator client {
   provider = "prisma-client-js"
 }
 
+generator nestgraphql {
+  provider               = "node node_modules/prisma-nestjs-graphql"
+  output                 = "../src/generated/prisma-nestjs-graphql"
+  fields_Validator_from  = "class-validator"
+  fields_Validator_input = true
+}
+
 generator nestjsDto {
   provider                        = "prisma-generator-nestjs-dto"
   output                          = "../src/generated/nestjs-dto"
@@ -26,16 +33,27 @@ datasource db {
 model User {
   id                   Int                 @id @default(autoincrement())
   username             String              @unique
+  ///@Validator.IsEmail()
   email                String              @unique
+  /// @HideField({input:false, output: true})
   password             String
+  /// @HideField({output: false, input:true})
   isActive             Boolean             @default(false)
+  /// @HideField({output: true, input:true})
   resetPasswordToken   String?             @unique
+  /// @HideField({output: true, input:true})
   resetPasswordExpires DateTime?
+  /// @HideField({output: false, input:true})
   roles                Roles2Users[]
+  /// @HideField({output: false, input:true})
   permissions          Permissions2Users[]
+  /// @HideField({output: false, input:true})
   createdAt            DateTime            @default(now())
+  /// @HideField({output: false, input:true})
   updatedAt            DateTime            @updatedAt
+  /// @HideField({output: false, input:true})
   createdBy            String?
+  /// @HideField({output: false, input:true})
   updatedBy            String?
 
   @@map("user")
@@ -44,11 +62,17 @@ model User {
 model Role {
   id          Int                 @id @default(autoincrement())
   name        String              @unique
+  /// @HideField({output: false, input:true})
   users       Roles2Users[]
+  /// @HideField({output: false, input:true})
   permissions Permissions2Roles[]
+  /// @HideField({output: false, input:true})
   createdAt   DateTime            @default(now())
+  /// @HideField({output: false, input:true})
   updatedAt   DateTime            @updatedAt
+  /// @HideField({output: false, input:true})
   createdBy   String?
+  /// @HideField({output: false, input:true})
   updatedBy   String?
 
   @@map("role")
@@ -57,11 +81,17 @@ model Role {
 model Permission {
   id        Int                 @id @default(autoincrement())
   name      String              @unique
+  /// @HideField({output: false, input:true})
   users     Permissions2Users[]
+  /// @HideField({output: false, input:true})
   roles     Permissions2Roles[]
+  /// @HideField({output: false, input:true})
   createdAt DateTime            @default(now())
+  /// @HideField({output: false, input:true})
   updatedAt DateTime            @updatedAt
+  /// @HideField({output: false, input:true})
   createdBy String?
+  /// @HideField({output: false, input:true})
   updatedBy String?
 
   @@map("permission")
@@ -72,9 +102,13 @@ model Roles2Users {
   roleId    Int
   user      User     @relation(fields: [userId], references: [id])
   userId    Int
+  /// @HideField({output: false, input:true})
   createdAt DateTime @default(now())
+  /// @HideField({output: false, input:true})
   updatedAt DateTime @updatedAt
+  /// @HideField({output: false, input:true})
   createdBy String?
+  /// @HideField({output: false, input:true})
   updatedBy String?
 
   @@id([roleId, userId])
@@ -86,9 +120,13 @@ model Permissions2Users {
   permissionId Int
   user         User       @relation(fields: [userId], references: [id])
   userId       Int
+  /// @HideField({output: false, input:true})
   createdAt    DateTime   @default(now())
+  /// @HideField({output: false, input:true})
   updatedAt    DateTime   @updatedAt
+  /// @HideField({output: false, input:true})
   createdBy    String?
+  /// @HideField({output: false, input:true})
   updatedBy    String?
 
   @@id([permissionId, userId])
@@ -100,9 +138,13 @@ model Permissions2Roles {
   permissionId Int
   role         Role       @relation(fields: [roleId], references: [id])
   roleId       Int
+  /// @HideField({output: false, input:true})
   createdAt    DateTime   @default(now())
+  /// @HideField({output: false, input:true})
   updatedAt    DateTime   @updatedAt
+  /// @HideField({output: false, input:true})
   createdBy    String?
+  /// @HideField({output: false, input:true})
   updatedBy    String?
 
   @@id([permissionId, roleId])
