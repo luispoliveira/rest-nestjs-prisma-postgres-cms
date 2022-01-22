@@ -8,12 +8,12 @@ import {
 } from '@nestjs/swagger';
 import { Public } from 'src/common/decorators/is-public.decorator';
 import { LocalAuthGuard } from 'src/common/guards/local-auth.guard';
-import { CreateUserDto } from 'src/generated/nestjs-dto/create-user.dto';
-import { User } from 'src/generated/nestjs-dto/user.entity';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dtos/login.dto';
 import { RecoverDto } from './dtos/recover.dto';
 import { ResetDto } from './dtos/reset.dto';
+import { User } from "../common/entities/user.entity";
+import { CreateUserDto } from "../users/dtos/create-user.dto";
 
 @ApiTags('Auth')
 @Controller('auth')

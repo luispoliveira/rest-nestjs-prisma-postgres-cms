@@ -12,12 +12,12 @@ import {
   ApiTags,
   ApiUnauthorizedResponse
 } from "@nestjs/swagger";
-import { Permission } from "src/generated/nestjs-dto/permission.entity";
-import { FindPermissionDto } from "../common/dtos/permissions/find-permission.dto";
+import { FindPermissionDto } from "./dtos/find-permission.dto";
 import { PermissionsService } from "./permissions.service";
 import { PaginationDto } from "../common/dtos/pagination.dto";
 import { OrderDto } from "../common/dtos/order.dto";
 import { BaseController } from "../common/controllers/base.controller";
+import { Permission } from "../common/entities/permission.entity";
 
 @ApiTags("Permissions")
 @ApiBearerAuth()

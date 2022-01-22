@@ -20,15 +20,15 @@ import {
   ApiUnauthorizedResponse
 } from "@nestjs/swagger";
 import { User } from "@prisma/client";
-import { Role } from "src/generated/nestjs-dto/role.entity";
 import { GetUser } from "src/common/decorators/get-user.decorator";
-import { CreateRoleDto } from "src/generated/nestjs-dto/create-role.dto";
-import { FindRoleDto } from "../common/dtos/roles/find-roles.dto";
-import { UpdateRoleDto } from "src/generated/nestjs-dto/update-role.dto";
-import { AddPermissionDto } from "../common/dtos/roles/add-permission.dto";
+import { FindRoleDto } from "./dtos/find-roles.dto";
+import { AddPermissionDto } from "./dtos/add-permission.dto";
 import { PaginationDto } from "../common/dtos/pagination.dto";
 import { OrderDto } from "../common/dtos/order.dto";
 import { BaseController } from "../common/controllers/base.controller";
+import { Role } from "../common/entities/role.entity";
+import { CreateRoleDto } from "./dtos/create-role.dto";
+import { UpdateRoleDto } from "./dtos/update-role.dto";
 
 @ApiTags("Roles")
 @ApiUnauthorizedResponse()

@@ -18,17 +18,18 @@ import {
   ApiTags,
   ApiUnauthorizedResponse
 } from "@nestjs/swagger";
+import { BaseController } from "src/common/controllers/base.controller";
 import { GetUser } from "src/common/decorators/get-user.decorator";
-import { AddRemovePermissionDto } from "../common/dtos/users/add-remove-permission.dto";
-import { AddRemoveRoleDto } from "../common/dtos/users/add-remove-role.dto";
-import { FindUserDto } from "../common/dtos/users/find-user.dto";
+import { User } from "src/common/entities/user.entity";
 import { UsersService } from "./users.service";
-import { User } from "../common/entities/user.entity";
-import { CreateUserDto } from "../common/dtos/users/create-user.dto";
-import { UpdateUserDto } from "../common/dtos/users/update-user.dto";
+import { CreateUserDto } from "./dtos/create-user.dto";
+import { FindUserDto } from "./dtos/find-user.dto";
 import { PaginationDto } from "../common/dtos/pagination.dto";
 import { OrderDto } from "../common/dtos/order.dto";
-import { BaseController } from "../common/controllers/base.controller";
+import { UpdateUserDto } from "./dtos/update-user.dto";
+import { AddRemoveRoleDto } from "./dtos/add-remove-role.dto";
+import { AddRemovePermissionDto } from "./dtos/add-remove-permission.dto";
+
 
 @ApiTags("Users")
 @ApiBearerAuth()
