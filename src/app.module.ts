@@ -16,6 +16,7 @@ import { UsersModule } from './users/users.module';
 import { GraphQLModule } from '@nestjs/graphql';
 import { join } from 'path/posix';
 import { ApolloServerPluginLandingPageLocalDefault } from 'apollo-server-core';
+import { CommandModule } from "nestjs-command";
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -42,6 +43,7 @@ import { ApolloServerPluginLandingPageLocalDefault } from 'apollo-server-core';
       // },
     }),
     PrismaModule,
+    CommandModule,
     RolesModule,
     UsersModule,
     AuthModule,
