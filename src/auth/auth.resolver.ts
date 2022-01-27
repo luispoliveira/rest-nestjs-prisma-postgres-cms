@@ -4,12 +4,13 @@ import { User } from "../generated/prisma-nestjs-graphql/user/user.model";
 import { LoginInput } from "./input-types/login.input";
 import { Login } from "./object-types/login.model";
 import { Public } from "../common/decorators/is-public.decorator";
-import { UnauthorizedException } from "@nestjs/common";
+import { UnauthorizedException, Request } from "@nestjs/common";
 import { UserCreateInput } from "../generated/prisma-nestjs-graphql/user/user-create.input";
 import { RecoverInput } from "./input-types/recover.input";
 import { RecoverModel } from "./object-types/recover.model";
 import { ResetModel } from "./object-types/reset.model";
 import { ResetInput } from "./input-types/reset.input";
+import { GqlRequest } from "../common/decorators/gql-request.decorator";
 
 @Resolver(of => User)
 export class AuthResolver {
@@ -18,8 +19,8 @@ export class AuthResolver {
 
   @Mutation(returns => Login)
   @Public()
-  // @UseGuards(LocalAuthGuard) Passport does not support LocalAuthGuards yett
-  async AuthLogin(@Args("loginInput") loginInput: LoginInput) {
+  // @UseGuards(LocalAuthGuard) Passport does not support LocalAuthGuards
+  async AuthLogin(@Args("loginInput") loginInput: LoginInput, @GqlRequest() request) {
     const user = await this.authService.validateUser(loginInput.username, loginInput.password);
     if (!user || !user.isActive)
       throw new UnauthorizedException("User does not exist or inactive");

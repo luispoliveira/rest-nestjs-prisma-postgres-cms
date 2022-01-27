@@ -150,3 +150,31 @@ model Permissions2Roles {
   @@id([permissionId, roleId])
   @@map("permission2role")
 }
+
+enum LogTypes {
+  log
+  error
+  verbose
+  warning
+  debug
+}
+
+model Log {
+  id        Int      @id @default(autoincrement())
+  context   String
+  type      LogTypes
+  route     String?
+  action    String?
+  dto       Json?
+  params    Json?
+  query     Json?
+  body      Json?
+  error     Json?
+  message   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  createdBy String?
+  updatedBy String?
+
+  @@map("log")
+}

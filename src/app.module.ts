@@ -1,39 +1,38 @@
-import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
-import { APP_GUARD } from '@nestjs/core';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { AuthModule } from './auth/auth.module';
-import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
-import { PermissionsGuard } from './common/guards/permissions.guard';
-import { RolesGuard } from './common/guards/roles.guard';
-import { configuration } from './config/configuration';
-import { validationSchema } from './config/validation';
-import { PermissionsModule } from './permissions/permissions.module';
-import { PrismaModule } from './prisma/prisma.module';
-import { RolesModule } from './roles/roles.module';
-import { UsersModule } from './users/users.module';
-import { GraphQLModule } from '@nestjs/graphql';
-import { join } from 'path/posix';
-import { ApolloServerPluginLandingPageLocalDefault } from 'apollo-server-core';
+import { Module } from "@nestjs/common";
+import { ConfigModule } from "@nestjs/config";
+import { AppController } from "./app.controller";
+import { AppService } from "./app.service";
+import { AuthModule } from "./auth/auth.module";
+import { configuration } from "./config/configuration";
+import { validationSchema } from "./config/validation";
+import { PermissionsModule } from "./permissions/permissions.module";
+import { PrismaModule } from "./prisma/prisma.module";
+import { RolesModule } from "./roles/roles.module";
+import { UsersModule } from "./users/users.module";
+import { GraphQLModule } from "@nestjs/graphql";
+import { join } from "path/posix";
+import { ApolloServerPluginLandingPageLocalDefault } from "apollo-server-core";
 import { CommandModule } from "nestjs-command";
+import { LoggerModule } from "./logger/logger.module";
+import { LogService } from "./logger/log.service";
+
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
       load: [configuration],
-      validationSchema,
+      validationSchema
     }),
     GraphQLModule.forRoot({
       // debug: false,
       playground: false,
       plugins: [ApolloServerPluginLandingPageLocalDefault()],
       subscriptions: {
-        'graphql-ws': true,
-        'subscriptions-transport-ws': true,
+        "graphql-ws": true,
+        "subscriptions-transport-ws": true
       },
       //@CodeFirst
-      autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+      autoSchemaFile: join(process.cwd(), "src/schema.gql"),
       sortSchema: true
       // @SchemaFirst
       // typePaths: ['./**/*.graphql'],
@@ -43,15 +42,17 @@ import { CommandModule } from "nestjs-command";
       // },
     }),
     PrismaModule,
+    LoggerModule,
     CommandModule,
     RolesModule,
     UsersModule,
     AuthModule,
-    PermissionsModule,
+    PermissionsModule
   ],
   controllers: [AppController],
   providers: [
-    AppService
-  ],
+    AppService,
+  ]
 })
-export class AppModule {}
+export class AppModule {
+}

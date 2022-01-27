@@ -3,9 +3,10 @@ import { RolesService } from "./roles.service";
 import { RolesController } from "./roles.controller";
 import { UsersModule } from "../users/users.module";
 import { RolesResolver } from './roles.resolver';
+import { LoggerModule } from "../logger/logger.module";
 
 @Module({
-  imports: [UsersModule],
+  imports: [UsersModule, LoggerModule],
   controllers: [RolesController],
   providers: [RolesService, RolesResolver]
 })
