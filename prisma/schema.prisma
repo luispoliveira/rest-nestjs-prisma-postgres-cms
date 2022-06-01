@@ -2,7 +2,9 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["interactiveTransactions", "improvedQueryRaw"]
+
 }
 
 generator nestgraphql {
@@ -12,17 +14,10 @@ generator nestgraphql {
   fields_Validator_input = true
 }
 
-generator nestjsDto {
-  provider                        = "prisma-generator-nestjs-dto"
-  output                          = "../src/generated/nestjs-dto"
-  outputToNestJsResourceStructure = "false"
-  exportRelationModifierClasses   = "true"
-  reExport                        = "false"
-  createDtoPrefix                 = "Create"
-  updateDtoPrefix                 = "Update"
-  dtoSuffix                       = "Dto"
-  entityPrefix                    = ""
-  entitySuffix                    = ""
+generator prismaClassGenerator {
+  provider = "prisma-class-generator"
+  dryRun   = false
+  output   = "../src/generated/prisma-class-generator"
 }
 
 datasource db {
@@ -31,6 +26,7 @@ datasource db {
 }
 
 model User {
+  /// @DtoReadOnly
   id                   Int                 @id @default(autoincrement())
   username             String              @unique
   ///@Validator.IsEmail()

@@ -11,45 +11,19 @@ import { PrismaService } from '../prisma/prisma.service';
 import { defaultRolesData } from './data/default-roles.data';
 
 @Injectable()
-export class RolesService implements OnModuleInit {
-  constructor(private readonly prisma: PrismaService) {
-    /**
-     * MIDDLEWARE DOCS
-     * https://www.prisma.io/docs/concepts/components/prisma-client/middleware#running-order-and-the-middleware-stack
-     */
-    this.prisma.$use(
-      async (
-        params: Prisma.MiddlewareParams,
-        next: (params: Prisma.MiddlewareParams) => Promise<Role>,
-      ) => {
-        if (
-          params.model === Prisma.ModelName.Role &&
-          params.action === 'findUnique'
-        ) {
-          const result = await next(params);
-          return result;
-        }
-        return next(params);
-      },
-    );
-  }
+export class RolesService {
+  constructor(private readonly prisma: PrismaService) {}
 
-  async onModuleInit() {
-    await this.ensureDefaultRoles();
-  }
-
-  private async ensureDefaultRoles() {
+  async ensureDefaultRoles() {
     for (let defaultRole of defaultRolesData) {
-      try {
-        await this.findOne({ name: defaultRole.name });
-      } catch (e) {
-        const newRole = await this.create({
-          name: defaultRole.name,
-          createdBy: 'admin',
-          updatedBy: 'admin',
-        });
-        Logger.log(`Role: ${newRole.name} created.`, RolesService.name);
-      }
+      const role = await this.findOne({ name: defaultRole.name });
+      if (role) return;
+      const newRole = await this.create({
+        name: defaultRole.name,
+        createdBy: 'admin',
+        updatedBy: 'admin',
+      });
+      Logger.log(`Role: ${newRole.name} created.`, RolesService.name);
     }
   }
 
@@ -73,7 +47,7 @@ export class RolesService implements OnModuleInit {
       return role;
     } catch (e) {
       Logger.error(e, RolesService.name);
-      throw new BadRequestException(e);
+      throw e;
     }
   }
 
@@ -121,10 +95,6 @@ export class RolesService implements OnModuleInit {
             permission: true,
           },
         },
-      },
-      rejectOnNotFound: (err: Error) => {
-        Logger.error(err, RolesService.name);
-        throw new NotFoundException('Role not found');
       },
     });
     return role;

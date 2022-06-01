@@ -10,9 +10,12 @@ import { Prisma, User } from '@prisma/client';
 import { ConfigService } from '@nestjs/config';
 import { PasswordUtil } from 'src/utils/password.util';
 import { RoleEnum } from 'src/roles/enums/role.enum';
+import { UsersMiddleware } from './users.middleware';
 
 @Injectable()
-export class UsersService implements OnModuleInit {
+export class UsersService {
+  private usersMiddleware: UsersMiddleware = new UsersMiddleware();
+
   private readonly defaultAdmin: {
     email: string;
     username: string;
@@ -31,64 +34,42 @@ export class UsersService implements OnModuleInit {
     this.prisma.$use(
       async (
         params: Prisma.MiddlewareParams,
-        next: (params: Prisma.MiddlewareParams) => Promise<User>,
+        next: (params: Prisma.MiddlewareParams) => Promise<User | User[]>,
       ) => {
-        if (params.model === Prisma.ModelName.User) {
-          if (params.action === 'create') {
-            params.args.data.password = await PasswordUtil.hash(
-              params.args.data.password,
-            );
-            const result = await next(params);
-            return result;
-          }
-          if (params.action === 'update' && params.args.data.password) {
-            params.args.data.password = await PasswordUtil.hash(
-              params.args.data.password,
-            );
-            const result = await next(params);
-            return result;
-          }
-        }
-        return next(params);
+        return this.usersMiddleware.handle(params, next);
       },
     );
   }
 
-  async onModuleInit() {
-    await this.ensureAdmin();
-  }
+  async ensureAdminUser() {
+    const user = await this.findOne({ username: this.defaultAdmin.username });
 
-  private async ensureAdmin() {
-    try {
-      const user = await this.findOne({ username: this.defaultAdmin.username });
-      Logger.log(
-        `Admin: ${user.username}; Email:${user.email}`,
-        UsersService.name,
-      );
-    } catch (e) {
-      const createdUser = await this.create({
-        username: this.defaultAdmin.username,
-        email: this.defaultAdmin.email,
-        password: this.defaultAdmin.password,
-        isActive: true,
-        createdBy: 'admin',
-        updatedBy: 'admin',
-        roles: {
-          create: {
-            role: {
-              connect: {
-                name: RoleEnum.Admin,
-              },
+    if (user) {
+      Logger.log(`Admin user : ${user.username}`, UsersService.name);
+      return true;
+    }
+    const createdUser = await this.create({
+      username: this.defaultAdmin.username,
+      email: this.defaultAdmin.email,
+      password: this.defaultAdmin.password,
+      isActive: true,
+      createdBy: 'admin',
+      updatedBy: 'admin',
+      roles: {
+        create: {
+          role: {
+            connect: {
+              name: RoleEnum.Admin,
             },
           },
         },
-      });
+      },
+    });
 
-      Logger.log(
-        `Admin user created: ${createdUser.username}`,
-        UsersService.name,
-      );
-    }
+    Logger.log(
+      `Admin user created: ${createdUser.username}`,
+      UsersService.name,
+    );
   }
 
   async create(data: Prisma.UserCreateInput): Promise<User> {
@@ -159,10 +140,6 @@ export class UsersService implements OnModuleInit {
             permission: true,
           },
         },
-      },
-      rejectOnNotFound: (err: Error) => {
-        Logger.error(err, UsersService.name);
-        return new NotFoundException('User not found');
       },
     });
     // if (!user) throw new NotFoundException("User not Found");

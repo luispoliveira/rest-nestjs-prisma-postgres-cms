@@ -249,6 +249,8 @@ type User {
   createdAt: DateTime!
   createdBy: String
   email: String!
+
+  """@DtoReadOnly"""
   id: ID!
   isActive: Boolean!
   permissions: [Permissions2Users!]

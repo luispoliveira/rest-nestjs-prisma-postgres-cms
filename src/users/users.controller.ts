@@ -8,8 +8,8 @@ import {
   Delete,
   Query,
   ParseIntPipe,
-  Request
-} from "@nestjs/common";
+  Request,
+} from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiBearerAuth,
@@ -17,132 +17,155 @@ import {
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiTags,
-  ApiUnauthorizedResponse
-} from "@nestjs/swagger";
-import { BaseController } from "src/common/controllers/base.controller";
-import { GetUser } from "src/common/decorators/get-user.decorator";
-import { User } from "src/common/entities/user.entity";
-import { UsersService } from "./users.service";
-import { CreateUserDto } from "./dtos/create-user.dto";
-import { FindUserDto } from "./dtos/find-user.dto";
-import { PaginationDto } from "../common/dtos/pagination.dto";
-import { OrderDto } from "../common/dtos/order.dto";
-import { UpdateUserDto } from "./dtos/update-user.dto";
-import { AddRemoveRoleDto } from "./dtos/add-remove-role.dto";
-import { AddRemovePermissionDto } from "./dtos/add-remove-permission.dto";
-import { LogService } from "../logger/log.service";
-import { LogTypes } from "@prisma/client";
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
+import { BaseController } from 'src/common/controllers/base.controller';
+import { GetUser } from 'src/common/decorators/get-user.decorator';
+import { UsersService } from './users.service';
+import { CreateUserDto } from './dtos/create-user.dto';
+import { FindUserDto } from './dtos/find-user.dto';
+import { PaginationDto } from '../common/dtos/pagination.dto';
+import { OrderDto } from '../common/dtos/order.dto';
+import { UpdateUserDto } from './dtos/update-user.dto';
+import { AddRemoveRoleDto } from './dtos/add-remove-role.dto';
+import { AddRemovePermissionDto } from './dtos/add-remove-permission.dto';
+import { LogService } from '../logger/log.service';
+import { LogTypes } from '@prisma/client';
+import { User } from 'src/generated/prisma-class-generator/user';
 
-
-@ApiTags("Users")
+@ApiTags('Users')
 @ApiBearerAuth()
 @ApiUnauthorizedResponse()
-@Controller("users")
+@Controller('users')
 export class UsersController extends BaseController {
-  constructor(private readonly usersService: UsersService, private readonly logService: LogService) {
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly logService: LogService,
+  ) {
     super(logService, UsersController.name);
   }
 
   @ApiCreatedResponse({ type: User, isArray: false })
   @ApiBadRequestResponse()
   @Post()
-  create(@Body() createUserDto: CreateUserDto, @GetUser() user: User, @Request() request) {
-    this.logger.audit(LogTypes.log, "User:create accessed", user.username, {
+  create(
+    @Body() createUserDto: CreateUserDto,
+    @GetUser() user: User,
+    @Request() request,
+  ) {
+    this.logger.audit(LogTypes.log, 'User:create accessed', user.username, {
       route: request.url,
       action: this.create.name,
       dto: createUserDto,
       params: request.params,
       query: request.query,
-      body: request.body
+      body: request.body,
     });
     return this.usersService.create({
       username: createUserDto.username,
       email: createUserDto.email,
       password: createUserDto.password,
       createdBy: user.username,
-      updatedBy: user.username
+      updatedBy: user.username,
     });
   }
 
   @ApiOkResponse({ type: User, isArray: true })
   @Get()
-  findAll(@Query() findUserDto: FindUserDto, @Query() paginationDto: PaginationDto, @Query() orderDto: OrderDto, @GetUser() user: User, @Request() request) {
-    this.logger.audit(LogTypes.log, "User:findAll accessed", user.username, {
+  findAll(
+    @Query() findUserDto: FindUserDto,
+    @Query() paginationDto: PaginationDto,
+    @Query() orderDto: OrderDto,
+    @GetUser() user: User,
+    @Request() request,
+  ) {
+    this.logger.audit(LogTypes.log, 'User:findAll accessed', user.username, {
       route: request.url,
       action: this.findAll.name,
       dto: findUserDto,
       params: request.params,
       query: request.query,
-      body: request.body
+      body: request.body,
     });
 
     const { page, limit } = paginationDto;
     const { orderDirection, orderField } = orderDto;
-    const {} =
-      findUserDto;
+    const {} = findUserDto;
     const skip = (page - 1) * limit;
     return this.usersService.findAll({
       skip: +skip,
       take: +limit,
       where: {},
       orderBy: {
-        [orderField]: orderDirection
-      }
+        [orderField]: orderDirection,
+      },
     });
   }
 
   @ApiOkResponse({ type: User, isArray: false })
   @ApiNotFoundResponse()
-  @Get(":id")
-  findOne(@Param("id", ParseIntPipe) id: number, @GetUser() user: User, @Request() request) {
-    this.logger.audit(LogTypes.log, "User:findAll accessed", user.username, {
+  @Get(':id')
+  async findOne(
+    @Param('id', ParseIntPipe) id: number,
+    @GetUser() user: User,
+    @Request() request,
+  ) {
+    this.logger.audit(LogTypes.log, 'User:findOne accessed', user.username, {
       route: request.url,
       action: this.findOne.name,
       dto: {},
       params: request.params,
       query: request.query,
-      body: request.body
+      body: request.body,
     });
-    return this.usersService.findOne({ id: id });
+    const userFinded = await this.usersService.findOne({ id: id });
+    if (!userFinded) {
+      throw new Error('User not found');
+    }
+    return userFinded;
   }
 
   @ApiOkResponse({ type: User, isArray: false })
   @ApiBadRequestResponse()
-  @Patch(":id")
+  @Patch(':id')
   update(
-    @Param("id", ParseIntPipe) id: number,
+    @Param('id', ParseIntPipe) id: number,
     @Body() updateUserDto: UpdateUserDto,
     @GetUser() user: User,
-    @Request() request
+    @Request() request,
   ) {
-    this.logger.audit(LogTypes.log, "User:update accessed", user.username, {
+    this.logger.audit(LogTypes.log, 'User:update accessed', user.username, {
       route: request.url,
       action: this.update.name,
       dto: updateUserDto,
       params: request.params,
       query: request.query,
-      body: request.body
+      body: request.body,
     });
 
     return this.usersService.update({
       where: { id: id },
       data: {
-        password: updateUserDto.password
-      }
+        password: updateUserDto.password,
+      },
     });
   }
 
   @ApiOkResponse({ type: User, isArray: false })
   @ApiBadRequestResponse()
-  @Delete(":id")
-  remove(@Param("id", ParseIntPipe) id: number, @GetUser() user: User, @Request() request) {
-    this.logger.audit(LogTypes.log, "User:remove accessed", user.username, {
+  @Delete(':id')
+  remove(
+    @Param('id', ParseIntPipe) id: number,
+    @GetUser() user: User,
+    @Request() request,
+  ) {
+    this.logger.audit(LogTypes.log, 'User:remove accessed', user.username, {
       route: request.url,
       action: this.remove.name,
       dto: {},
       params: request.params,
       query: request.query,
-      body: request.body
+      body: request.body,
     });
 
     return this.usersService.remove({ id: id });
@@ -150,20 +173,20 @@ export class UsersController extends BaseController {
 
   @ApiOkResponse({ type: User, isArray: false })
   @ApiBadRequestResponse()
-  @Post("add-role/:id")
+  @Post('add-role/:id')
   addRole(
-    @Param("id", ParseIntPipe) id: number,
+    @Param('id', ParseIntPipe) id: number,
     @Body() addRole: AddRemoveRoleDto,
     @GetUser() user: User,
-    @Request() request
+    @Request() request,
   ) {
-    this.logger.audit(LogTypes.log, "User:addRole accessed", user.username, {
+    this.logger.audit(LogTypes.log, 'User:addRole accessed', user.username, {
       route: request.url,
       action: this.addRole.name,
       dto: addRole,
       params: request.params,
       query: request.query,
-      body: request.body
+      body: request.body,
     });
 
     return this.usersService.update({
@@ -175,41 +198,46 @@ export class UsersController extends BaseController {
             where: {
               roleId_userId: {
                 roleId: addRole.roleId,
-                userId: id
-              }
+                userId: id,
+              },
             },
             create: {
               createdBy: user.username,
               updatedBy: user.username,
               role: {
                 connect: {
-                  id: addRole.roleId
-                }
-              }
-            }
-          }
-        }
-      }
+                  id: addRole.roleId,
+                },
+              },
+            },
+          },
+        },
+      },
     });
   }
 
   @ApiOkResponse({ type: User, isArray: false })
   @ApiBadRequestResponse()
-  @Post("remove-role/:id")
+  @Post('remove-role/:id')
   removeRole(
-    @Param("id", ParseIntPipe) id: number,
+    @Param('id', ParseIntPipe) id: number,
     @Body() removeRole: AddRemoveRoleDto,
     @GetUser() user: User,
-    @Request() request
+    @Request() request,
   ) {
-    this.logger.audit(LogTypes.log, "User:removerRole accessed", user.username, {
-      route: request.url,
-      action: this.removeRole.name,
-      dto: removeRole,
-      params: request.params,
-      query: request.query,
-      body: request.body
-    });
+    this.logger.audit(
+      LogTypes.log,
+      'User:removerRole accessed',
+      user.username,
+      {
+        route: request.url,
+        action: this.removeRole.name,
+        dto: removeRole,
+        params: request.params,
+        query: request.query,
+        body: request.body,
+      },
+    );
 
     return this.usersService.update({
       where: { id: id },
@@ -219,31 +247,36 @@ export class UsersController extends BaseController {
           delete: {
             roleId_userId: {
               roleId: removeRole.roleId,
-              userId: id
-            }
-          }
-        }
-      }
+              userId: id,
+            },
+          },
+        },
+      },
     });
   }
 
   @ApiOkResponse({ type: User, isArray: false })
   @ApiBadRequestResponse()
-  @Post("add-permission/:id")
+  @Post('add-permission/:id')
   addPermission(
-    @Param("id", ParseIntPipe) id: number,
+    @Param('id', ParseIntPipe) id: number,
     @Body() addPermission: AddRemovePermissionDto,
     @GetUser() user: User,
-    @Request() request
+    @Request() request,
   ) {
-    this.logger.audit(LogTypes.log, "User:addPermission accessed", user.username, {
-      route: request.url,
-      action: this.addPermission.name,
-      dto: addPermission,
-      params: request.params,
-      query: request.query,
-      body: request.body
-    });
+    this.logger.audit(
+      LogTypes.log,
+      'User:addPermission accessed',
+      user.username,
+      {
+        route: request.url,
+        action: this.addPermission.name,
+        dto: addPermission,
+        params: request.params,
+        query: request.query,
+        body: request.body,
+      },
+    );
 
     return this.usersService.update({
       where: { id: id },
@@ -254,41 +287,46 @@ export class UsersController extends BaseController {
             where: {
               permissionId_userId: {
                 permissionId: addPermission.permissionId,
-                userId: id
-              }
+                userId: id,
+              },
             },
             create: {
               createdBy: user.username,
               updatedBy: user.username,
               permission: {
                 connect: {
-                  id: addPermission.permissionId
-                }
-              }
-            }
-          }
-        }
-      }
+                  id: addPermission.permissionId,
+                },
+              },
+            },
+          },
+        },
+      },
     });
   }
 
   @ApiOkResponse({ type: User, isArray: false })
   @ApiBadRequestResponse()
-  @Post("remove-permission/:id")
+  @Post('remove-permission/:id')
   removePermission(
-    @Param("id", ParseIntPipe) id: number,
+    @Param('id', ParseIntPipe) id: number,
     @Body() removePermission: AddRemovePermissionDto,
     @GetUser() user: User,
-    @Request() request
+    @Request() request,
   ) {
-    this.logger.audit(LogTypes.log, "User:removePermission accessed", user.username, {
-      route: request.url,
-      action: this.removePermission.name,
-      dto: removePermission,
-      params: request.params,
-      query: request.query,
-      body: request.body
-    });
+    this.logger.audit(
+      LogTypes.log,
+      'User:removePermission accessed',
+      user.username,
+      {
+        route: request.url,
+        action: this.removePermission.name,
+        dto: removePermission,
+        params: request.params,
+        query: request.query,
+        body: request.body,
+      },
+    );
 
     return this.usersService.update({
       where: { id: id },
@@ -298,11 +336,11 @@ export class UsersController extends BaseController {
           delete: {
             permissionId_userId: {
               permissionId: removePermission.permissionId,
-              userId: id
-            }
-          }
-        }
-      }
+              userId: id,
+            },
+          },
+        },
+      },
     });
   }
 }

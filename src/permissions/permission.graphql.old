@@ -1,6 +1,0 @@
-type Permission {
-  id: Int!
-  name: String!
-  roles: [Role]
-  users: [User]
-}

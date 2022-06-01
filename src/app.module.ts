@@ -15,6 +15,7 @@ import { ApolloServerPluginLandingPageLocalDefault } from "apollo-server-core";
 import { CommandModule } from "nestjs-command";
 import { LoggerModule } from "./logger/logger.module";
 import { LogService } from "./logger/log.service";
+import { ApolloDriver, ApolloDriverConfig } from "@nestjs/apollo";
 
 @Module({
   imports: [
@@ -23,9 +24,10 @@ import { LogService } from "./logger/log.service";
       load: [configuration],
       validationSchema
     }),
-    GraphQLModule.forRoot({
-      // debug: false,
+    GraphQLModule.forRoot<ApolloDriverConfig>({
+      debug: false,
       playground: false,
+      driver: ApolloDriver,
       plugins: [ApolloServerPluginLandingPageLocalDefault()],
       subscriptions: {
         "graphql-ws": true,

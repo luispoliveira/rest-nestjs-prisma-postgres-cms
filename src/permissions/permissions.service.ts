@@ -11,38 +11,33 @@ import { RoleEnum } from 'src/roles/enums/role.enum';
 import { DefaultPermissionData } from './data/default-permission.data';
 
 @Injectable()
-export class PermissionsService implements OnModuleInit {
+export class PermissionsService {
   constructor(private readonly prisma: PrismaService) {}
-  async onModuleInit() {
-    await this.ensureDefaultPermissions();
-  }
 
-  private async ensureDefaultPermissions() {
+  async ensureDefaultPermissions() {
     for (let defaultPermission of DefaultPermissionData) {
-      try {
-        await this.findOne({
-          name: defaultPermission.name,
-        });
-      } catch (e) {
-        const newPermission = await this.create({
-          name: defaultPermission.name,
-          createdBy: 'admin',
-          updatedBy: 'admin',
-          roles: {
-            create: {
-              role: {
-                connect: {
-                  name: RoleEnum.Admin,
-                },
+      const permission = await this.findOne({
+        name: defaultPermission.name,
+      });
+      if (permission) return;
+      const newPermission = await this.create({
+        name: defaultPermission.name,
+        createdBy: 'admin',
+        updatedBy: 'admin',
+        roles: {
+          create: {
+            role: {
+              connect: {
+                name: RoleEnum.Admin,
               },
             },
           },
-        });
-        Logger.log(
-          `Role: ${newPermission.name} created.`,
-          PermissionsService.name,
-        );
-      }
+        },
+      });
+      Logger.log(
+        `Role: ${newPermission.name} created.`,
+        PermissionsService.name,
+      );
     }
   }
 
@@ -115,10 +110,6 @@ export class PermissionsService implements OnModuleInit {
             user: true,
           },
         },
-      },
-      rejectOnNotFound: (err: Error) => {
-        Logger.error(err, PermissionsService.name);
-        throw new NotFoundException('Permission not found');
       },
     });
     return permission;

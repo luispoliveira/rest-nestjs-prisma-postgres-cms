@@ -1,14 +1,14 @@
-import { Module } from "@nestjs/common";
-import { RolesService } from "./roles.service";
-import { RolesController } from "./roles.controller";
-import { UsersModule } from "../users/users.module";
+import { Module } from '@nestjs/common';
+import { RolesService } from './roles.service';
+import { RolesController } from './roles.controller';
+import { UsersModule } from '../users/users.module';
 import { RolesResolver } from './roles.resolver';
-import { LoggerModule } from "../logger/logger.module";
+import { LoggerModule } from '../logger/logger.module';
 
 @Module({
   imports: [UsersModule, LoggerModule],
   controllers: [RolesController],
-  providers: [RolesService, RolesResolver]
+  providers: [RolesService, RolesResolver],
+  exports: [RolesService],
 })
-export class RolesModule {
-}
+export class RolesModule {}
