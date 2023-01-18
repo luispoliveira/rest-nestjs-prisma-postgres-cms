@@ -3,16 +3,36 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { AppModule } from './app.module';
 import * as helmet from 'helmet';
 import * as csurf from 'csurf';
-import { Logger, ValidationPipe } from '@nestjs/common';
+import { Logger, LogLevel, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { PrismaModel } from './generated/prisma-class-generator';
+import { PrismaModel } from 'prisma/__generated__/prisma-class-generator';
+import { EnvironmentEnum } from './shared';
+import { PrismaService } from './prisma/prisma.service';
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  const logger: LogLevel[] = ['error', 'warn'];
+
+  switch (process.env.NODE_ENV) {
+    case EnvironmentEnum.Development:
+      logger.push('log');
+      logger.push('debug');
+      logger.push('verbose');
+      break;
+    case EnvironmentEnum.Test:
+      logger.push('log');
+      break;
+  }
+
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+    logger,
+  });
   const config = app.get(ConfigService);
   const port = config.get('port');
   const globalPrefix = config.get('globalPrefix');
+
+  const prismaService = app.get(PrismaService);
+  await prismaService.enableShutdownHooks(app);
 
   // app.use(helmet());
   app.enableCors();

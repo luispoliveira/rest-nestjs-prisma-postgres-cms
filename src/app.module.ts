@@ -1,47 +1,48 @@
-import { Module } from "@nestjs/common";
-import { ConfigModule } from "@nestjs/config";
-import { AppController } from "./app.controller";
-import { AppService } from "./app.service";
-import { AuthModule } from "./auth/auth.module";
-import { configuration } from "./config/configuration";
-import { validationSchema } from "./config/validation";
-import { PermissionsModule } from "./permissions/permissions.module";
-import { PrismaModule } from "./prisma/prisma.module";
-import { RolesModule } from "./roles/roles.module";
-import { UsersModule } from "./users/users.module";
-import { GraphQLModule } from "@nestjs/graphql";
-import { join } from "path/posix";
-import { ApolloServerPluginLandingPageLocalDefault } from "apollo-server-core";
-import { CommandModule } from "nestjs-command";
-import { LoggerModule } from "./logger/logger.module";
-import { LogService } from "./logger/log.service";
-import { ApolloDriver, ApolloDriverConfig } from "@nestjs/apollo";
+import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+import { AuthModule } from './auth/auth.module';
+import { PermissionsModule } from './permissions/permissions.module';
+import { PrismaModule } from './prisma/prisma.module';
+import { RolesModule } from './roles/roles.module';
+import { UsersModule } from './users/users.module';
+import { GraphQLModule } from '@nestjs/graphql';
+import { join } from 'path/posix';
+import {
+  ApolloServerPluginLandingPageLocalDefault,
+  ApolloServerPluginLandingPageProductionDefault,
+} from '@apollo/server/plugin/landingPage/default';
+
+import { CommandModule } from 'nestjs-command';
+import { LoggerModule } from './logger/logger.module';
+import { LogService } from './logger/log.service';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
+import { EnvironmentEnum } from './shared';
+import { configuration, validationSchema } from './config';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
       load: [configuration],
-      validationSchema
+      validationSchema,
     }),
-    GraphQLModule.forRoot<ApolloDriverConfig>({
-      debug: false,
+    GraphQLModule.forRoot({
+      debug: process.env.NODE_ENV === EnvironmentEnum.Development,
       playground: false,
       driver: ApolloDriver,
-      plugins: [ApolloServerPluginLandingPageLocalDefault()],
+      plugins:
+        process.env.NODE_ENV === EnvironmentEnum.Production
+          ? [ApolloServerPluginLandingPageProductionDefault()]
+          : [ApolloServerPluginLandingPageLocalDefault()],
       subscriptions: {
-        "graphql-ws": true,
-        "subscriptions-transport-ws": true
+        'graphql-ws': true,
+        'subscriptions-transport-ws': true,
       },
-      //@CodeFirst
-      autoSchemaFile: join(process.cwd(), "src/schema.gql"),
-      sortSchema: true
-      // @SchemaFirst
-      // typePaths: ['./**/*.graphql'],
-      // definitions: {
-      //   path: join(process.cwd(), 'src/graphql.ts'),
-      //   outputAs: 'class',
-      // },
+      persistedQueries: false,
+      autoSchemaFile: true,
+      sortSchema: true,
     }),
     PrismaModule,
     LoggerModule,
@@ -49,12 +50,9 @@ import { ApolloDriver, ApolloDriverConfig } from "@nestjs/apollo";
     RolesModule,
     UsersModule,
     AuthModule,
-    PermissionsModule
+    PermissionsModule,
   ],
   controllers: [AppController],
-  providers: [
-    AppService,
-  ]
+  providers: [AppService],
 })
-export class AppModule {
-}
+export class AppModule {}
