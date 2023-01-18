@@ -58,7 +58,6 @@ async function bootstrap() {
     Logger.log(`GraphQL at http://localhost:${port}/graphql`);
     // Logger.log(`Api Doc: http://localhost:${port}/${globalPrefix}/api-docs`);
     Logger.log(`Running in ${config.get('environment')} mode`);
-    Logger.log('Teste Space');
   });
 }
 
