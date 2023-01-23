@@ -11,25 +11,14 @@ import { EnvironmentEnum } from './shared';
 import { PrismaService } from './prisma/prisma.service';
 
 async function bootstrap() {
-  const logger: LogLevel[] = ['error', 'warn'];
-
-  switch (process.env.NODE_ENV) {
-    case EnvironmentEnum.Development:
-      logger.push('log');
-      logger.push('debug');
-      logger.push('verbose');
-      break;
-    case EnvironmentEnum.Test:
-      logger.push('log');
-      break;
-  }
-
-  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
-    logger,
-  });
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
   const config = app.get(ConfigService);
+
+  const environment = config.get('environment');
   const port = config.get('port');
   const globalPrefix = config.get('globalPrefix');
+
+  app.useLogger(getLogger(environment));
 
   const prismaService = app.get(PrismaService);
   await prismaService.enableShutdownHooks(app);
@@ -57,8 +46,25 @@ async function bootstrap() {
     Logger.log(`Listening at http://localhost:${port}/${globalPrefix}`);
     Logger.log(`GraphQL at http://localhost:${port}/graphql`);
     // Logger.log(`Api Doc: http://localhost:${port}/${globalPrefix}/api-docs`);
-    Logger.log(`Running in ${config.get('environment')} mode`);
+    Logger.log(`Running in ${environment} mode`);
   });
 }
 
 bootstrap();
+
+export const getLogger = (environment: string): LogLevel[] => {
+  const logger: LogLevel[] = ['error', 'warn'];
+
+  switch (environment) {
+    case EnvironmentEnum.Development:
+      logger.push('log');
+      logger.push('debug');
+      logger.push('verbose');
+      break;
+    case EnvironmentEnum.Test:
+      logger.push('log');
+      break;
+  }
+
+  return logger;
+};
