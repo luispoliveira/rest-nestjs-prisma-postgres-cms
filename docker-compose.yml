@@ -6,13 +6,11 @@ volumes:
 services:
   postgres:
     container_name: postgres
-    image: postgres:13
+    image: postgres:15.1
     ports:
       - "5432:5432"
-    environment:
-      POSTGRES_DB: nestjs
-      POSTGRES_USER: nestjs
-      POSTGRES_PASSWORD: nestjs
+    env_file:
+      - ./docker/postgres.env
     volumes:
       - nestjs_db_data:/var/lib/postgresql/data
 
