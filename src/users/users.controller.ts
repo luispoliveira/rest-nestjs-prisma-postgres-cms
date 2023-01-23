@@ -31,7 +31,7 @@ import { AddRemoveRoleDto } from './dtos/add-remove-role.dto';
 import { AddRemovePermissionDto } from './dtos/add-remove-permission.dto';
 import { LogService } from '../logger/log.service';
 import { LogTypes } from '@prisma/client';
-import { User } from 'src/generated/prisma-class-generator/user';
+import { User } from 'prisma/__generated__/prisma-class-generator/user';
 
 @ApiTags('Users')
 @ApiBearerAuth()

@@ -17,10 +17,5 @@
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
-    "paths": {
-      "@nestjs_prisma/prisma-graphql": [
-        "prisma/__generated__/prisma-nestjs-graphql/index.ts"
-      ]
-    }
   }
 }

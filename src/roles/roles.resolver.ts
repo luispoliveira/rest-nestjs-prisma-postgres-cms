@@ -1,16 +1,18 @@
 import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
-import { Role } from '../generated/prisma-nestjs-graphql/role/role.model';
 import { BaseResolver } from '../common/resolvers/base.resolver';
 import { RolesService } from './roles.service';
 import { PaginationInput } from '../common/graphql/inputs/pagination.input';
-import { RoleOrderByWithRelationInput } from '../generated/prisma-nestjs-graphql/role/role-order-by-with-relation.input';
-import { RoleWhereInput } from '../generated/prisma-nestjs-graphql/role/role-where.input';
-import { RoleWhereUniqueInput } from '../generated/prisma-nestjs-graphql/role/role-where-unique.input';
-import { RoleCreateInput } from '../generated/prisma-nestjs-graphql/role/role-create.input';
 import { GqlGetUser } from '../common/decorators/gql-get-user.decorator';
 import { User } from '@prisma/client';
-import { RoleUpdateInput } from '../generated/prisma-nestjs-graphql/role/role-update.input';
 import { NotFoundException } from '@nestjs/common';
+import {
+  Role,
+  RoleCreateInput,
+  RoleOrderByWithRelationInput,
+  RoleUpdateInput,
+  RoleWhereInput,
+  RoleWhereUniqueInput,
+} from '../../prisma/__generated__/prisma-nestjs-graphql';
 
 @Resolver((of) => Role)
 export class RolesResolver extends BaseResolver {

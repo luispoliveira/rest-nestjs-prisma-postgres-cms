@@ -1,15 +1,17 @@
 import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
-import { UserOrderByWithRelationInput } from 'src/generated/prisma-nestjs-graphql/user/user-order-by-with-relation.input';
-import { UserWhereInput } from 'src/generated/prisma-nestjs-graphql/user/user-where.input';
-import { User } from 'src/generated/prisma-nestjs-graphql/user/user.model';
 import { UsersService } from './users.service';
 import { PaginationInput } from '../common/graphql/inputs/pagination.input';
-import { UserWhereUniqueInput } from '../generated/prisma-nestjs-graphql/user/user-where-unique.input';
-import { UserCreateInput } from '../generated/prisma-nestjs-graphql/user/user-create.input';
-import { UserUpdateInput } from '../generated/prisma-nestjs-graphql/user/user-update.input';
 import { BaseResolver } from '../common/resolvers/base.resolver';
 import { GqlGetUser } from '../common/decorators/gql-get-user.decorator';
 import { NotFoundException } from '@nestjs/common';
+import {
+  User,
+  UserCreateInput,
+  UserOrderByWithRelationInput,
+  UserUpdateInput,
+  UserWhereInput,
+  UserWhereUniqueInput,
+} from '../../prisma/__generated__/prisma-nestjs-graphql';
 
 @Resolver((of) => User)
 export class UsersResolver extends BaseResolver {

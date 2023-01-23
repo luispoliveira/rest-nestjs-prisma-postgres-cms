@@ -31,7 +31,7 @@ import { BaseController } from '../common/controllers/base.controller';
 import { CreateRoleDto } from './dtos/create-role.dto';
 import { UpdateRoleDto } from './dtos/update-role.dto';
 import { LogService } from '../logger/log.service';
-import { Role } from 'src/generated/prisma-class-generator/role';
+import { Role } from 'prisma/__generated__/prisma-class-generator/role';
 
 @ApiTags('Roles')
 @ApiUnauthorizedResponse()

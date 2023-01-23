@@ -1,13 +1,14 @@
 import { Args, Query, Resolver } from '@nestjs/graphql';
 import { BaseResolver } from '../common/resolvers/base.resolver';
 import { PermissionsService } from './permissions.service';
-import { Permission } from '../generated/prisma-nestjs-graphql/permission/permission.model';
 import { PaginationInput } from '../common/graphql/inputs/pagination.input';
-import { PermissionOrderByWithRelationInput } from '../generated/prisma-nestjs-graphql/permission/permission-order-by-with-relation.input';
-import { RoleWhereInput } from '../generated/prisma-nestjs-graphql/role/role-where.input';
-import { PermissionWhereInput } from '../generated/prisma-nestjs-graphql/permission/permission-where.input';
-import { PermissionWhereUniqueInput } from '../generated/prisma-nestjs-graphql/permission/permission-where-unique.input';
 import { NotFoundException } from '@nestjs/common';
+import {
+  Permission,
+  PermissionOrderByWithRelationInput,
+  PermissionWhereInput,
+  PermissionWhereUniqueInput,
+} from '../../prisma/__generated__/prisma-nestjs-graphql';
 
 @Resolver((of) => Permission)
 export class PermissionsResolver extends BaseResolver {

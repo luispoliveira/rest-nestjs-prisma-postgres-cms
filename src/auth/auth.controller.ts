@@ -16,7 +16,7 @@ import { CreateUserDto } from '../users/dtos/create-user.dto';
 import { MyLoggerService } from '../logger/my-logger.service';
 import { LogService } from '../logger/log.service';
 import { LogTypes } from '@prisma/client';
-import { User } from 'src/generated/prisma-class-generator/user';
+import { User } from 'prisma/__generated__/prisma-class-generator/user';
 
 @ApiTags('Auth')
 @Controller('auth')

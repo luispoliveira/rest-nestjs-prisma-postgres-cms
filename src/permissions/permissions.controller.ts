@@ -22,7 +22,7 @@ import { BaseController } from '../common/controllers/base.controller';
 import { LogTypes, User } from '@prisma/client';
 import { LogService } from '../logger/log.service';
 import { GetUser } from '../common/decorators/get-user.decorator';
-import { Permission } from 'src/generated/prisma-class-generator/permission';
+import { Permission } from 'prisma/__generated__/prisma-class-generator/permission';
 
 @ApiTags('Permissions')
 @ApiBearerAuth()
