@@ -1,14 +1,12 @@
-import { NestFactory } from '@nestjs/core';
-import { NestExpressApplication } from '@nestjs/platform-express';
-import { AppModule } from './app.module';
-import * as helmet from 'helmet';
-import * as csurf from 'csurf';
 import { Logger, LogLevel, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { NestFactory } from '@nestjs/core';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { PrismaModel } from 'prisma/__generated__/prisma-class-generator';
-import { EnvironmentEnum } from './shared';
+import { AppModule } from './app.module';
 import { PrismaService } from './prisma/prisma.service';
+import { EnvironmentEnum } from './shared';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);

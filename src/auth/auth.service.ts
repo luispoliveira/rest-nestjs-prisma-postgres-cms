@@ -5,12 +5,11 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { Prisma, User } from '@prisma/client';
+import { JwtPayloadInterface } from '../common/interfaces/jwt-payload.interface';
 import { UsersService } from '../users/users.service';
 import { PasswordUtil } from '../utils/password.util';
-import { Prisma, User } from '@prisma/client';
 import { LoginResponseInterface } from './interfaces/login-response.interface';
-import { JwtPayloadInterface } from '../common/interfaces/jwt-payload.interface';
-import { randomBytes } from 'crypto';
 
 @Injectable()
 export class AuthService {
@@ -95,15 +94,15 @@ export class AuthService {
     });
   }
 
-  private async generatePasswordReset(user: User) {
-    const expirationDate = Date.now() + 3600000;
+  // private async generatePasswordReset(user: User) {
+  //   const expirationDate = Date.now() + 3600000;
 
-    await this.usersService.update({
-      where: { id: user.id },
-      data: {
-        resetPasswordToken: randomBytes(20).toString('hex'),
-        resetPasswordExpires: new Date(expirationDate),
-      },
-    });
-  }
+  //   await this.usersService.update({
+  //     where: { id: user.id },
+  //     data: {
+  //       resetPasswordToken: randomBytes(20).toString('hex'),
+  //       resetPasswordExpires: new Date(expirationDate),
+  //     },
+  //   });
+  // }
 }

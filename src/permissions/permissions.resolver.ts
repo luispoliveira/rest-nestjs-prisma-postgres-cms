@@ -1,22 +1,22 @@
-import { Args, Query, Resolver } from '@nestjs/graphql';
-import { BaseResolver } from '../common/resolvers/base.resolver';
-import { PermissionsService } from './permissions.service';
-import { PaginationInput } from '../common/graphql/inputs/pagination.input';
 import { NotFoundException } from '@nestjs/common';
+import { Args, Query, Resolver } from '@nestjs/graphql';
 import {
   Permission,
   PermissionOrderByWithRelationInput,
   PermissionWhereInput,
   PermissionWhereUniqueInput,
 } from '../../prisma/__generated__/prisma-nestjs-graphql';
+import { PaginationInput } from '../common/graphql/inputs/pagination.input';
+import { BaseResolver } from '../common/resolvers/base.resolver';
+import { PermissionsService } from './permissions.service';
 
-@Resolver((of) => Permission)
+@Resolver(() => Permission)
 export class PermissionsResolver extends BaseResolver {
   constructor(private readonly permissionsService: PermissionsService) {
     super();
   }
 
-  @Query((results) => [Permission])
+  @Query(() => [Permission])
   PermissionGetPermissions(
     @Args('pagination', { nullable: true }) paginationInput: PaginationInput,
     @Args('orderBy', { nullable: true })
@@ -33,7 +33,7 @@ export class PermissionsResolver extends BaseResolver {
     });
   }
 
-  @Query((results) => Permission)
+  @Query(() => Permission)
   async PermissionGetPermission(
     @Args('permissionWhereUnique')
     permissionWhereUniqueInput: PermissionWhereUniqueInput,

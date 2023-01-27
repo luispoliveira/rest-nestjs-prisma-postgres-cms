@@ -1,9 +1,9 @@
-import { UseGuards } from "@nestjs/common";
-import { GqlAuthGuard } from "../guards/gql-auth.guard";
-import { RolesGuard } from "../guards/roles.guard";
-import { PermissionsGuard } from "../guards/permissions.guard";
+import { UseGuards, UseInterceptors } from '@nestjs/common';
+import { LoggerInterceptor } from 'src/logger/logger.interceptor';
+import { JwtAuthGuard } from '../guards/jwt-auth.guard';
+import { PermissionsGuard } from '../guards/permissions.guard';
+import { RolesGuard } from '../guards/roles.guard';
 
-@UseGuards(GqlAuthGuard, RolesGuard, PermissionsGuard)
-export class BaseResolver {
-
-}
+@UseInterceptors(LoggerInterceptor)
+@UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
+export class BaseResolver {}

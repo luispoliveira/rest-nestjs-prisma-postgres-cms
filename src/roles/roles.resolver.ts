@@ -2,7 +2,6 @@ import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { BaseResolver } from '../common/resolvers/base.resolver';
 import { RolesService } from './roles.service';
 import { PaginationInput } from '../common/graphql/inputs/pagination.input';
-import { GqlGetUser } from '../common/decorators/gql-get-user.decorator';
 import { User } from '@prisma/client';
 import { NotFoundException } from '@nestjs/common';
 import {
@@ -13,14 +12,15 @@ import {
   RoleWhereInput,
   RoleWhereUniqueInput,
 } from '../../prisma/__generated__/prisma-nestjs-graphql';
+import { GetUser } from 'src/common/decorators/get-user.decorator';
 
-@Resolver((of) => Role)
+@Resolver(() => Role)
 export class RolesResolver extends BaseResolver {
   constructor(private readonly rolesService: RolesService) {
     super();
   }
 
-  @Query((returns) => [Role])
+  @Query(() => [Role])
   RoleGetRoles(
     @Args('pagination', { nullable: true }) paginationInput: PaginationInput,
     @Args('orderBy', { nullable: true })
@@ -36,7 +36,7 @@ export class RolesResolver extends BaseResolver {
     });
   }
 
-  @Query((returns) => Role)
+  @Query(() => Role)
   async RoleGetRole(
     @Args('roleWhereUnique') roleWhereUniqueInput: RoleWhereUniqueInput,
   ) {
@@ -45,10 +45,10 @@ export class RolesResolver extends BaseResolver {
     return role;
   }
 
-  @Mutation((returns) => Role)
+  @Mutation(() => Role)
   RoleCreateRole(
     @Args('roleCreateInput') roleCreateInput: RoleCreateInput,
-    @GqlGetUser() user: User,
+    @GetUser() user: User,
   ) {
     return this.rolesService.create({
       ...roleCreateInput,
@@ -57,11 +57,11 @@ export class RolesResolver extends BaseResolver {
     });
   }
 
-  @Mutation((returns) => Role)
+  @Mutation(() => Role)
   RoleUpdateRole(
     @Args({ name: 'roleId', type: () => Int }) roleId: number,
     @Args('roleUpdateInput') roleUpdateInput: RoleUpdateInput,
-    @GqlGetUser() user: User,
+    @GetUser() user: User,
   ) {
     return this.rolesService.update({
       where: { id: roleId },
@@ -72,16 +72,16 @@ export class RolesResolver extends BaseResolver {
     });
   }
 
-  @Mutation((returns) => Role)
+  @Mutation(() => Role)
   RoleDeleteRole(@Args({ name: 'roleId', type: () => Int }) roleId: number) {
     return this.rolesService.remove({ id: roleId });
   }
 
-  @Mutation((returns) => Role)
+  @Mutation(() => Role)
   RoleAddPermission(
     @Args({ name: 'roleId', type: () => Int }) roleId: number,
     @Args({ name: 'permissionId', type: () => Int }) permissionId: number,
-    @GqlGetUser() user: User,
+    @GetUser() user: User,
   ) {
     return this.rolesService.update({
       where: { id: roleId },
@@ -110,11 +110,11 @@ export class RolesResolver extends BaseResolver {
     });
   }
 
-  @Mutation((returns) => Role)
+  @Mutation(() => Role)
   RoleRemovePermission(
     @Args({ name: 'roleId', type: () => Int }) roleId: number,
     @Args({ name: 'permissionId', type: () => Int }) permissionId: number,
-    @GqlGetUser() user: User,
+    @GetUser() user: User,
   ) {
     return this.rolesService.update({
       where: { id: roleId },

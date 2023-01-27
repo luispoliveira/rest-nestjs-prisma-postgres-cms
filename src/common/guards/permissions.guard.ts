@@ -1,7 +1,6 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { User } from '@prisma/client';
-import { Observable } from 'rxjs';
 import { PermissionEnum } from 'src/permissions/enums/permission.enum';
 import { UsersService } from 'src/users/users.service';
 import { PERMISSIONS_KEY } from '../decorators/permission.decorator';

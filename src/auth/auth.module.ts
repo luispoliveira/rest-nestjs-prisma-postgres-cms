@@ -1,13 +1,12 @@
-import { Module } from "@nestjs/common";
-import { AuthService } from "./auth.service";
-import { AuthController } from "./auth.controller";
-import { UsersModule } from "../users/users.module";
-import { JwtStrategy } from "./strategys/jwt.strategy";
-import { JwtModule } from "@nestjs/jwt";
-import { ConfigService } from "@nestjs/config";
-import { LocalStrategy } from "./strategys/local.strategy";
-import { AuthResolver } from "./auth.resolver";
-import { LoggerModule } from "../logger/logger.module";
+import { Module } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { JwtModule } from '@nestjs/jwt';
+import { UsersModule } from '../users/users.module';
+import { AuthController } from './auth.controller';
+import { AuthResolver } from './auth.resolver';
+import { AuthService } from './auth.service';
+import { JwtStrategy } from './strategys/jwt.strategy';
+import { LocalStrategy } from './strategys/local.strategy';
 
 @Module({
   imports: [
@@ -15,17 +14,16 @@ import { LoggerModule } from "../logger/logger.module";
     JwtModule.registerAsync({
       useFactory: async (config: ConfigService) => {
         return {
-          secret: config.get("jwtSecretKey"),
+          secret: config.get('jwtSecretKey'),
           signOptions: {
-            expiresIn: "60m"
-          }
+            expiresIn: '60m',
+          },
         };
       },
-      inject: [ConfigService]
+      inject: [ConfigService],
     }),
-    LoggerModule],
+  ],
   providers: [AuthService, LocalStrategy, JwtStrategy, AuthResolver],
-  controllers: [AuthController]
+  controllers: [AuthController],
 })
-export class AuthModule {
-}
+export class AuthModule {}

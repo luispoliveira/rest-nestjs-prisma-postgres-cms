@@ -5,7 +5,7 @@ import { EnvironmentEnum } from 'src/shared';
 
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit {
-  constructor(private readonly configService: ConfigService) {
+  constructor(configService: ConfigService) {
     const log: Prisma.LogLevel[] = ['warn', 'error'];
 
     switch (configService.get<string>('environment')) {

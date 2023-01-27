@@ -1,5 +1,10 @@
+import {
+  ApolloServerPluginLandingPageLocalDefault,
+  ApolloServerPluginLandingPageProductionDefault,
+} from '@apollo/server/plugin/landingPage/default';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { GraphQLModule } from '@nestjs/graphql';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
@@ -7,19 +12,12 @@ import { PermissionsModule } from './permissions/permissions.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { RolesModule } from './roles/roles.module';
 import { UsersModule } from './users/users.module';
-import { GraphQLModule } from '@nestjs/graphql';
-import { join } from 'path/posix';
-import {
-  ApolloServerPluginLandingPageLocalDefault,
-  ApolloServerPluginLandingPageProductionDefault,
-} from '@apollo/server/plugin/landingPage/default';
 
+import { ApolloDriver } from '@nestjs/apollo';
 import { CommandModule } from 'nestjs-command';
-import { LoggerModule } from './logger/logger.module';
-import { LogService } from './logger/log.service';
-import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
-import { EnvironmentEnum } from './shared';
 import { configuration, validationSchema } from './config';
+import { LoggerModule } from './logger/logger.module';
+import { EnvironmentEnum } from './shared';
 
 @Module({
   imports: [

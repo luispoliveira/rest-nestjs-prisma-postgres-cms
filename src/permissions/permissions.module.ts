@@ -1,12 +1,11 @@
 import { Module } from '@nestjs/common';
-import { PermissionsService } from './permissions.service';
-import { PermissionsController } from './permissions.controller';
 import { UsersModule } from '../users/users.module';
+import { PermissionsController } from './permissions.controller';
 import { PermissionsResolver } from './permissions.resolver';
-import { LoggerModule } from '../logger/logger.module';
+import { PermissionsService } from './permissions.service';
 
 @Module({
-  imports: [UsersModule, LoggerModule],
+  imports: [UsersModule],
   controllers: [PermissionsController],
   providers: [PermissionsService, PermissionsResolver],
   exports: [PermissionsService],

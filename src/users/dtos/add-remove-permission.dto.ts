@@ -1,4 +1,4 @@
-import { ApiProduces, ApiProperty } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 import { IsInt, IsNotEmpty } from 'class-validator';
 
 export class AddRemovePermissionDto {

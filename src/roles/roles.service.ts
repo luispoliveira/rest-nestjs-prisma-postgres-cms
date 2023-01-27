@@ -1,12 +1,5 @@
-import {
-  BadRequestException,
-  Injectable,
-  Logger,
-  NotFoundException,
-  OnModuleDestroy,
-  OnModuleInit,
-} from '@nestjs/common';
-import { Prisma, Role } from '@prisma/client';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { defaultRolesData } from './data/default-roles.data';
 

@@ -1,9 +1,6 @@
-import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
-import { UsersService } from './users.service';
-import { PaginationInput } from '../common/graphql/inputs/pagination.input';
-import { BaseResolver } from '../common/resolvers/base.resolver';
-import { GqlGetUser } from '../common/decorators/gql-get-user.decorator';
 import { NotFoundException } from '@nestjs/common';
+import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { GetUser } from 'src/common/decorators/get-user.decorator';
 import {
   User,
   UserCreateInput,
@@ -12,14 +9,17 @@ import {
   UserWhereInput,
   UserWhereUniqueInput,
 } from '../../prisma/__generated__/prisma-nestjs-graphql';
+import { PaginationInput } from '../common/graphql/inputs/pagination.input';
+import { BaseResolver } from '../common/resolvers/base.resolver';
+import { UsersService } from './users.service';
 
-@Resolver((of) => User)
+@Resolver(() => User)
 export class UsersResolver extends BaseResolver {
   constructor(private readonly usersService: UsersService) {
     super();
   }
 
-  @Query((returns) => [User])
+  @Query(() => [User])
   UserGetUsers(
     @Args('pagination', { nullable: true }) paginationInput: PaginationInput,
     @Args('orderBy', { nullable: true })
@@ -35,7 +35,7 @@ export class UsersResolver extends BaseResolver {
     });
   }
 
-  @Query((returns) => User)
+  @Query(() => User)
   async UserGetUser(
     @Args('userWhereUnique') userWhereUniqueInput: UserWhereUniqueInput,
   ) {
@@ -44,10 +44,10 @@ export class UsersResolver extends BaseResolver {
     return user;
   }
 
-  @Mutation((returns) => User)
+  @Mutation(() => User)
   UserCreateUser(
     @Args('userCreateInput') userCreateInput: UserCreateInput,
-    @GqlGetUser() user: User,
+    @GetUser() user: User,
   ) {
     return this.usersService.create({
       ...userCreateInput,
@@ -56,11 +56,11 @@ export class UsersResolver extends BaseResolver {
     });
   }
 
-  @Mutation((returns) => User)
+  @Mutation(() => User)
   UserUpdateUser(
     @Args({ name: 'userId', type: () => Int }) userId: number,
     @Args('userUpdateInput') userUpdateInput: UserUpdateInput,
-    @GqlGetUser() user: User,
+    @GetUser() user: User,
   ) {
     return this.usersService.update({
       where: { id: userId },
@@ -68,16 +68,16 @@ export class UsersResolver extends BaseResolver {
     });
   }
 
-  @Mutation((returns) => User)
+  @Mutation(() => User)
   UserDeleteUser(@Args({ name: 'userId', type: () => Int }) userId: number) {
     return this.usersService.remove({ id: userId });
   }
 
-  @Mutation((returns) => User)
+  @Mutation(() => User)
   UserAddRole(
     @Args({ name: 'userId', type: () => Int }) userId: number,
     @Args({ name: 'roleId', type: () => Int }) roleId: number,
-    @GqlGetUser() user: User,
+    @GetUser() user: User,
   ) {
     return this.usersService.update({
       where: { id: userId },
@@ -106,11 +106,11 @@ export class UsersResolver extends BaseResolver {
     });
   }
 
-  @Mutation((returns) => User)
+  @Mutation(() => User)
   UserRemoveRole(
     @Args({ name: 'userId', type: () => Int }) userId: number,
     @Args({ name: 'roleId', type: () => Int }) roleId: number,
-    @GqlGetUser() user: User,
+    @GetUser() user: User,
   ) {
     return this.usersService.update({
       where: { id: userId },
@@ -128,11 +128,11 @@ export class UsersResolver extends BaseResolver {
     });
   }
 
-  @Mutation((returns) => User)
+  @Mutation(() => User)
   UserAddPermission(
     @Args({ name: 'userId', type: () => Int }) userId: number,
     @Args({ name: 'permissionsId', type: () => Int }) permissionId: number,
-    @GqlGetUser() user: User,
+    @GetUser() user: User,
   ) {
     return this.usersService.update({
       where: { id: userId },
@@ -161,11 +161,11 @@ export class UsersResolver extends BaseResolver {
     });
   }
 
-  @Mutation((returns) => User)
+  @Mutation(() => User)
   UserRemovePermission(
     @Args({ name: 'userId', type: () => Int }) userId: number,
     @Args({ name: 'permissionsId', type: () => Int }) permissionId: number,
-    @GqlGetUser() user: User,
+    @GetUser() user: User,
   ) {
     return this.usersService.update({
       where: { id: userId },

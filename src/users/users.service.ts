@@ -1,15 +1,8 @@
-import {
-  BadRequestException,
-  Injectable,
-  Logger,
-  NotFoundException,
-  OnModuleInit,
-} from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { Prisma, User } from '@prisma/client';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { PasswordUtil } from 'src/utils/password.util';
+import { Prisma, User } from '@prisma/client';
 import { RoleEnum } from 'src/roles/enums/role.enum';
+import { PrismaService } from '../prisma/prisma.service';
 import { UsersMiddleware } from './users.middleware';
 
 @Injectable()

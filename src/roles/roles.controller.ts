@@ -1,17 +1,15 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
-  Query,
-  Request,
-  ParseIntPipe,
+  Get,
   NotFoundException,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+  Query,
 } from '@nestjs/common';
-import { RolesService } from './roles.service';
 import {
   ApiBadRequestResponse,
   ApiBearerAuth,
@@ -21,28 +19,25 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { LogTypes, User } from '@prisma/client';
-import { GetUser } from 'src/common/decorators/get-user.decorator';
-import { FindRoleDto } from './dtos/find-roles.dto';
-import { AddPermissionDto } from './dtos/add-permission.dto';
-import { PaginationDto } from '../common/dtos/pagination.dto';
-import { OrderDto } from '../common/dtos/order.dto';
-import { BaseController } from '../common/controllers/base.controller';
-import { CreateRoleDto } from './dtos/create-role.dto';
-import { UpdateRoleDto } from './dtos/update-role.dto';
-import { LogService } from '../logger/log.service';
+import { User } from '@prisma/client';
 import { Role } from 'prisma/__generated__/prisma-class-generator/role';
+import { GetUser } from 'src/common/decorators/get-user.decorator';
+import { BaseController } from '../common/controllers/base.controller';
+import { OrderDto } from '../common/dtos/order.dto';
+import { PaginationDto } from '../common/dtos/pagination.dto';
+import { AddPermissionDto } from './dtos/add-permission.dto';
+import { CreateRoleDto } from './dtos/create-role.dto';
+import { FindRoleDto } from './dtos/find-roles.dto';
+import { UpdateRoleDto } from './dtos/update-role.dto';
+import { RolesService } from './roles.service';
 
 @ApiTags('Roles')
 @ApiUnauthorizedResponse()
 @ApiBearerAuth()
 @Controller('roles')
 export class RolesController extends BaseController {
-  constructor(
-    private readonly rolesService: RolesService,
-    private readonly logService: LogService,
-  ) {
-    super(logService, RolesController.name);
+  constructor(private readonly rolesService: RolesService) {
+    super();
   }
 
   @ApiCreatedResponse({ type: Role, isArray: false })
@@ -51,16 +46,8 @@ export class RolesController extends BaseController {
   create(
     @Body() createRoleDto: CreateRoleDto,
     @GetUser() user: User,
-    @Request() request,
+    //@Request() request,
   ) {
-    this.logger.audit(LogTypes.log, 'Role:create accessed', user.username, {
-      route: request.url,
-      action: this.create.name,
-      dto: createRoleDto,
-      params: request.params,
-      query: request.query,
-      body: request.body,
-    });
     return this.rolesService.create({
       name: createRoleDto.name,
       createdBy: user.username,
@@ -74,18 +61,9 @@ export class RolesController extends BaseController {
     @Query() findRoleDto: FindRoleDto,
     @Query() paginationDto: PaginationDto,
     @Query() orderDto: OrderDto,
-    @GetUser() user: User,
-    @Request() request,
+    //@GetUser() user: User,
+    //@Request() request,
   ) {
-    this.logger.audit(LogTypes.log, 'Role:findAll accessed', user.username, {
-      route: request.url,
-      action: this.findAll.name,
-      dto: findRoleDto,
-      params: request.params,
-      query: request.query,
-      body: request.body,
-    });
-
     const { page, limit } = paginationDto;
     const { orderField, orderDirection } = orderDto;
     const { name } = findRoleDto;
@@ -107,17 +85,9 @@ export class RolesController extends BaseController {
   @Get(':id')
   async findOne(
     @Param('id', ParseIntPipe) id: number,
-    @GetUser() user: User,
-    @Request() request,
+    //@GetUser() user: User,
+    //@Request() request,
   ) {
-    this.logger.audit(LogTypes.log, 'Role:findOne accessed', user.username, {
-      route: request.url,
-      action: this.findOne.name,
-      dto: {},
-      params: request.params,
-      query: request.query,
-      body: request.body,
-    });
     const role = await this.rolesService.findOne({
       id: id,
     });
@@ -132,17 +102,8 @@ export class RolesController extends BaseController {
     @Param('id', ParseIntPipe) id: number,
     @Body() updateRoleDto: UpdateRoleDto,
     @GetUser() user: User,
-    @Request() request,
+    //@Request() request,
   ) {
-    this.logger.audit(LogTypes.log, 'Role:update accessed', user.username, {
-      route: request.url,
-      action: this.update.name,
-      dto: updateRoleDto,
-      params: request.params,
-      query: request.query,
-      body: request.body,
-    });
-
     return this.rolesService.update({
       where: { id: id },
       data: {
@@ -157,17 +118,9 @@ export class RolesController extends BaseController {
   @Delete(':id')
   remove(
     @Param('id', ParseIntPipe) id: number,
-    @GetUser() user: User,
-    @Request() request,
+    //@GetUser() user: User,
+    //@Request() request,
   ) {
-    this.logger.audit(LogTypes.log, 'Role:remove accessed', user.username, {
-      route: request.url,
-      action: this.remove.name,
-      dto: {},
-      params: request.params,
-      query: request.query,
-      body: request.body,
-    });
     return this.rolesService.remove({ id: id });
   }
 
@@ -179,22 +132,8 @@ export class RolesController extends BaseController {
     @Param('id', ParseIntPipe) id: number,
     @Body() addPermissionDto: AddPermissionDto,
     @GetUser() user: User,
-    @Request() request,
+    //@Request() request,
   ) {
-    this.logger.audit(
-      LogTypes.log,
-      'Role:addPermission accessed',
-      user.username,
-      {
-        route: request.url,
-        action: this.addPermission.name,
-        dto: addPermissionDto,
-        params: request.params,
-        query: request.query,
-        body: request.body,
-      },
-    );
-
     return this.rolesService.update({
       where: { id: id },
       data: {
@@ -229,22 +168,8 @@ export class RolesController extends BaseController {
     @Param('id', ParseIntPipe) id: number,
     @Body() removePermission: AddPermissionDto,
     @GetUser() user: User,
-    @Request() request,
+    //@Request() request,
   ) {
-    this.logger.audit(
-      LogTypes.log,
-      'Role:removePermission accessed',
-      user.username,
-      {
-        route: request.url,
-        action: this.removePermission.name,
-        dto: removePermission,
-        params: request.params,
-        query: request.query,
-        body: request.body,
-      },
-    );
-
     return this.rolesService.update({
       where: { id: id },
       data: {
