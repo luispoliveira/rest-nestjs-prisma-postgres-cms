@@ -2,12 +2,13 @@ import { NotFoundException } from '@nestjs/common';
 import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { GetUser } from 'src/common/decorators/get-user.decorator';
 import {
+  CreateOneUserArgs,
+  DeleteOneUserArgs,
+  FindUniqueUserArgs,
+  UpdateOneUserArgs,
   User,
-  UserCreateInput,
   UserOrderByWithRelationInput,
-  UserUpdateInput,
   UserWhereInput,
-  UserWhereUniqueInput,
 } from '../../prisma/__generated__/prisma-nestjs-graphql';
 import { PaginationInput } from '../common/graphql/inputs/pagination.input';
 import { BaseResolver } from '../common/resolvers/base.resolver';
@@ -36,41 +37,39 @@ export class UsersResolver extends BaseResolver {
   }
 
   @Query(() => User)
-  async UserGetUser(
-    @Args('userWhereUnique') userWhereUniqueInput: UserWhereUniqueInput,
-  ) {
-    const user = await this.usersService.findOne(userWhereUniqueInput);
+  async UserGetUser(@Args() args: FindUniqueUserArgs) {
+    const user = await this.usersService.findOne(args);
     if (!user) throw new NotFoundException('User not Found');
     return user;
   }
 
   @Mutation(() => User)
-  UserCreateUser(
-    @Args('userCreateInput') userCreateInput: UserCreateInput,
-    @GetUser() user: User,
-  ) {
+  UserCreateUser(@Args() args: CreateOneUserArgs, @GetUser() user: User) {
     return this.usersService.create({
-      ...userCreateInput,
-      createdBy: user.username,
-      updatedBy: user.username,
+      data: {
+        ...args.data,
+        createdBy: user.username,
+        updatedBy: user.username,
+      },
     });
   }
 
   @Mutation(() => User)
-  UserUpdateUser(
-    @Args({ name: 'userId', type: () => Int }) userId: number,
-    @Args('userUpdateInput') userUpdateInput: UserUpdateInput,
-    @GetUser() user: User,
-  ) {
+  UserUpdateUser(@Args() args: UpdateOneUserArgs, @GetUser() user: User) {
     return this.usersService.update({
-      where: { id: userId },
-      data: { ...userUpdateInput, updatedBy: user.username },
+      where: { ...args.where },
+      data: {
+        ...args.data,
+        updatedBy: user.username,
+      },
     });
   }
 
   @Mutation(() => User)
-  UserDeleteUser(@Args({ name: 'userId', type: () => Int }) userId: number) {
-    return this.usersService.remove({ id: userId });
+  UserDeleteUser(@Args() args: DeleteOneUserArgs) {
+    return this.usersService.remove({
+      ...args,
+    });
   }
 
   @Mutation(() => User)

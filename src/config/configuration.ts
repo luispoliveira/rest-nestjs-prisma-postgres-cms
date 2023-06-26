@@ -7,5 +7,9 @@ export const configuration = () => ({
     email: process.env.ADMIN_EMAIL,
     password: process.env.ADMIN_PASSWORD,
   },
-  jwtSecretKey: process.env.JWT_SECRET_KEY,
+  jwtSecretKey: {
+    ignoreExpiration: process.env.JWT_IGNORE_EXPIRATION,
+    access: process.env.JWT_ACCESS_SECRET_KEY,
+    expiresIn: process.env.JWT_EXPIRES_IN,
+  },
 });

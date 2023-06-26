@@ -14,9 +14,9 @@ import { LocalStrategy } from './strategys/local.strategy';
     JwtModule.registerAsync({
       useFactory: async (config: ConfigService) => {
         return {
-          secret: config.get('jwtSecretKey'),
+          secret: config.get('jwtSecretKey').access,
           signOptions: {
-            expiresIn: '60m',
+            expiresIn: config.get('jwtSecretKey').expiresIn,
           },
         };
       },

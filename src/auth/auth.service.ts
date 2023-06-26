@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Prisma, User } from '@prisma/client';
-import { JwtPayloadInterface } from '../common/interfaces/jwt-payload.interface';
+import { JwtPayloadType } from 'src/shared';
 import { UsersService } from '../users/users.service';
 import { PasswordUtil } from '../utils/password.util';
 import { LoginResponseInterface } from './interfaces/login-response.interface';
@@ -23,7 +23,9 @@ export class AuthService {
 
     try {
       user = await this.usersService.findOne({
-        username: username,
+        where: {
+          username: username,
+        },
       });
     } catch (e) {
       return null;
@@ -42,7 +44,7 @@ export class AuthService {
   }
 
   async login(user: User): Promise<LoginResponseInterface> {
-    const payload: JwtPayloadInterface = {
+    const payload: JwtPayloadType = {
       userId: user.id,
       username: user.username,
     };
@@ -55,7 +57,7 @@ export class AuthService {
   }
 
   async signUp(data: Prisma.UserCreateInput) {
-    const user = await this.usersService.create(data);
+    const user = await this.usersService.create({ data });
     const {
       password,
       resetPasswordExpires,
@@ -68,7 +70,7 @@ export class AuthService {
 
   async recoverPassword(email: string) {
     const user = await this.usersService.findOne({
-      email: email,
+      where: { email: email },
     });
 
     if (!user) throw new NotFoundException('Email not found');
@@ -76,7 +78,7 @@ export class AuthService {
 
   async resetPassword(resetToken: string, password: string) {
     const user = await this.usersService.findOne({
-      resetPasswordToken: resetToken,
+      where: { resetPasswordToken: resetToken },
     });
 
     if (!user) throw new BadRequestException('Reset Token does not exist');

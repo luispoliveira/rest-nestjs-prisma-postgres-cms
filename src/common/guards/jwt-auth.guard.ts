@@ -4,9 +4,9 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { GqlContextType, GqlExecutionContext } from '@nestjs/graphql';
 import { AuthGuard } from '@nestjs/passport';
 import { Observable } from 'rxjs';
+import { ContextUtil } from 'src/utils/context.util';
 import { IS_PUBLIC_KEY } from '../decorators/is-public.decorator';
 
 @Injectable()
@@ -29,11 +29,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
   }
 
   getRequest(context: ExecutionContext) {
-    if (context.getType() === 'http')
-      return context.switchToHttp().getRequest();
-
-    if (context.getType<GqlContextType>() === 'graphql')
-      return GqlExecutionContext.create(context).getContext().req;
+    return ContextUtil.getRequest(context);
   }
 
   handleRequest<TUser = any>(

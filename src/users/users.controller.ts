@@ -48,11 +48,13 @@ export class UsersController extends BaseController {
     //@Request() request,
   ) {
     return this.usersService.create({
-      username: createUserDto.username,
-      email: createUserDto.email,
-      password: createUserDto.password,
-      createdBy: user.username,
-      updatedBy: user.username,
+      data: {
+        username: createUserDto.username,
+        email: createUserDto.email,
+        password: createUserDto.password,
+        createdBy: user.username,
+        updatedBy: user.username,
+      },
     });
   }
 
@@ -87,7 +89,9 @@ export class UsersController extends BaseController {
     //@GetUser() user: User,
     //@Request() request,
   ) {
-    const userFinded = await this.usersService.findOne({ id: id });
+    const userFinded = await this.usersService.findOne({
+      where: { id: id },
+    });
     if (!userFinded) {
       throw new Error('User not found');
     }
@@ -119,7 +123,7 @@ export class UsersController extends BaseController {
     //@GetUser() user: User,
     //@Request() request,
   ) {
-    return this.usersService.remove({ id: id });
+    return this.usersService.remove({ where: { id: id } });
   }
 
   @ApiOkResponse({ type: User, isArray: false })

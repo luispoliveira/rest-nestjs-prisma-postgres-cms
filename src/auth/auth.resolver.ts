@@ -19,10 +19,10 @@ import { ResetModel } from './object-types/reset.model';
 export class AuthResolver {
   constructor(private readonly authService: AuthService) {}
 
-  @Mutation(() => Login)
+  @Mutation(() => Login, { name: 'AuthLogin' })
   @Public()
   // @UseGuards(LocalAuthGuard) Passport does not support LocalAuthGuards
-  async AuthLogin(
+  async login(
     @Args('loginInput') loginInput: LoginInput,
     //@GqlRequest() request,
   ) {
@@ -35,9 +35,9 @@ export class AuthResolver {
     return this.authService.login(user as User);
   }
 
-  @Mutation(() => User)
+  @Mutation(() => User, { name: 'AuthSignUp' })
   @Public()
-  AuthSignUp(@Args('signUpInput') userCreateInput: UserCreateInput) {
+  signUp(@Args('signUpInput') userCreateInput: UserCreateInput) {
     return this.authService.signUp({
       username: userCreateInput.username,
       email: userCreateInput.email,
@@ -45,14 +45,14 @@ export class AuthResolver {
     });
   }
 
-  @Mutation(() => RecoverModel)
-  async AuthRecoverPassword(@Args('recoverInput') recoverInput: RecoverInput) {
+  @Mutation(() => RecoverModel, { name: 'AuthRecoverPassword' })
+  async recoverPassword(@Args('recoverInput') recoverInput: RecoverInput) {
     await this.authService.recoverPassword(recoverInput.email);
     return { message: 'A reset email has been sent to your email.' };
   }
 
-  @Mutation(() => ResetModel)
-  async AuthResetPassword(@Args('resetInput') resetInput: ResetInput) {
+  @Mutation(() => ResetModel, { name: 'AuthResetPassword' })
+  async resetPassword(@Args('resetInput') resetInput: ResetInput) {
     await this.authService.resetPassword(
       resetInput.resetToken,
       resetInput.password,

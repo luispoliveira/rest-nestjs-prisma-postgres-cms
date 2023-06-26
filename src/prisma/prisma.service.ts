@@ -1,10 +1,17 @@
-import { INestApplication, Injectable, OnModuleInit } from '@nestjs/common';
+import {
+  INestApplication,
+  Injectable,
+  Logger,
+  OnModuleInit,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Prisma, PrismaClient } from '@prisma/client';
 import { EnvironmentEnum } from 'src/shared';
 
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit {
+  private readonly logger = new Logger(PrismaService.name);
+
   constructor(configService: ConfigService) {
     const log: Prisma.LogLevel[] = ['warn', 'error'];
 
@@ -25,7 +32,12 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
   }
 
   async onModuleInit() {
-    await this.$connect();
+    try {
+      await this.$connect();
+    } catch (error) {
+      this.logger.error(error);
+      this.onModuleInit();
+    }
   }
 
   async enableShutdownHooks(app: INestApplication) {

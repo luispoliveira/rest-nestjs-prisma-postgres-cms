@@ -8,7 +8,7 @@ import { UsersMiddleware } from './users.middleware';
 @Injectable()
 export class UsersService {
   private usersMiddleware: UsersMiddleware = new UsersMiddleware();
-
+  private readonly logger = new Logger(UsersService.name);
   private readonly defaultAdmin: {
     email: string;
     username: string;
@@ -35,40 +35,41 @@ export class UsersService {
   }
 
   async ensureAdminUser() {
-    const user = await this.findOne({ username: this.defaultAdmin.username });
+    const user = await this.findOne({
+      where: { username: this.defaultAdmin.username },
+    });
 
     if (user) {
-      Logger.log(`Admin user : ${user.username}`, UsersService.name);
+      this.logger.log(`Admin user : ${user.username}`);
       return true;
     }
     const createdUser = await this.create({
-      username: this.defaultAdmin.username,
-      email: this.defaultAdmin.email,
-      password: this.defaultAdmin.password,
-      isActive: true,
-      createdBy: 'admin',
-      updatedBy: 'admin',
-      roles: {
-        create: {
-          role: {
-            connect: {
-              name: RoleEnum.Admin,
+      data: {
+        username: this.defaultAdmin.username,
+        email: this.defaultAdmin.email,
+        password: this.defaultAdmin.password,
+        isActive: true,
+        createdBy: 'admin',
+        updatedBy: 'admin',
+        roles: {
+          create: {
+            role: {
+              connect: {
+                name: RoleEnum.Admin,
+              },
             },
           },
         },
       },
     });
 
-    Logger.log(
-      `Admin user created: ${createdUser.username}`,
-      UsersService.name,
-    );
+    this.logger.log(`Admin user created: ${createdUser.username}`);
   }
 
-  async create(data: Prisma.UserCreateInput): Promise<User> {
+  async create(args: Prisma.UserCreateArgs): Promise<User> {
     try {
       const user = await this.prisma.user.create({
-        data: data,
+        ...args,
         include: {
           roles: {
             include: {
@@ -84,26 +85,14 @@ export class UsersService {
       });
       return user;
     } catch (e) {
-      Logger.error(e, UsersService.name);
+      this.logger.error(e);
       throw new BadRequestException(e);
     }
   }
 
-  async findAll(params: {
-    skip?: number;
-    take?: number;
-    cursor?: Prisma.UserWhereUniqueInput;
-    where?: Prisma.UserWhereInput;
-    orderBy?: Prisma.UserOrderByWithRelationInput;
-  }): Promise<User[]> {
-    const { skip, take, cursor, where, orderBy } = params;
-
+  async findAll(args: Prisma.UserFindManyArgs): Promise<User[]> {
     return await this.prisma.user.findMany({
-      skip: skip,
-      take: take,
-      cursor: cursor,
-      where: where,
-      orderBy: orderBy,
+      ...args,
       include: {
         roles: {
           include: {
@@ -119,9 +108,9 @@ export class UsersService {
     });
   }
 
-  async findOne(userWhereUniqueInput: Prisma.UserWhereUniqueInput) {
-    const user = await this.prisma.user.findUnique({
-      where: userWhereUniqueInput,
+  async findOne(args: Prisma.UserFindUniqueArgs) {
+    return await this.prisma.user.findUnique({
+      ...args,
       include: {
         roles: {
           include: {
@@ -135,21 +124,12 @@ export class UsersService {
         },
       },
     });
-    // if (!user) throw new NotFoundException("User not Found");
-
-    return user;
   }
 
-  async update(params: {
-    where: Prisma.UserWhereUniqueInput;
-    data: Prisma.UserUpdateInput;
-  }): Promise<User> {
-    const { data, where } = params;
-
+  async update(args: Prisma.UserUpdateArgs): Promise<User> {
     try {
       return await this.prisma.user.update({
-        data: data,
-        where: where,
+        ...args,
         include: {
           roles: {
             include: {
@@ -164,18 +144,18 @@ export class UsersService {
         },
       });
     } catch (e) {
-      Logger.error(e, UsersService.name);
+      this.logger.error(e);
       throw new BadRequestException(e);
     }
   }
 
-  async remove(where: Prisma.UserWhereUniqueInput): Promise<User> {
+  async remove(args: Prisma.UserDeleteArgs): Promise<User> {
     try {
       return await this.prisma.user.delete({
-        where: where,
+        ...args,
       });
     } catch (e) {
-      Logger.error(e, UsersService.name);
+      this.logger.error(e);
       throw new BadRequestException(e);
     }
   }

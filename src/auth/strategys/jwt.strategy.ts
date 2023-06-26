@@ -1,9 +1,9 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
-import { User } from '@prisma/client';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import { JwtPayloadInterface } from '../../common/interfaces/jwt-payload.interface';
+import { JwtPayloadType } from 'src/shared';
+import { UserValidate } from 'src/shared/types/user-validate.type';
 import { UsersService } from '../../users/users.service';
 
 @Injectable()
@@ -12,22 +12,30 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     configService: ConfigService,
     private readonly usersService: UsersService,
   ) {
+    const jwtSecretKey = configService.get<{
+      ignoreExpiration: boolean;
+      access: string;
+      expiresIn: string;
+    }>('jwtSecretKey');
+
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      ignoreExpiration: false,
-      secretOrKey: configService.get('jwtSecretKey'),
+      ignoreExpiration: jwtSecretKey.ignoreExpiration,
+      secretOrKey: jwtSecretKey.access,
     });
   }
 
-  async validate(payload: JwtPayloadInterface): Promise<User> {
+  async validate(payload: JwtPayloadType): Promise<UserValidate> {
     const { userId } = payload;
-    try {
-      const user = await this.usersService.findOne({
-        id: userId,
-      });
-      return user;
-    } catch (e) {
-      throw new UnauthorizedException('User not Found');
-    }
+
+    const user = await this.usersService.findOne({
+      where: { id: userId },
+    });
+
+    if (!user) throw new UnauthorizedException();
+
+    return {
+      ...user,
+    };
   }
 }

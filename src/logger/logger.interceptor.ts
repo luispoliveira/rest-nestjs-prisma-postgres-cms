@@ -4,12 +4,18 @@ import {
   Injectable,
   NestInterceptor,
 } from '@nestjs/common';
-import { GqlContextType, GqlExecutionContext } from '@nestjs/graphql';
 import { Observable, tap } from 'rxjs';
+import { ContextUtil } from 'src/utils/context.util';
 import { LoggerService } from './logger.service';
 
 @Injectable()
 export class LoggerInterceptor implements NestInterceptor {
+  private readonly blackListedMethods = [
+    'login',
+    'signUp',
+    'recoverPassword',
+    'resetPassword',
+  ];
   //private logger = new Logger(LoggerInterceptor.name);
 
   constructor(private readonly loggerService: LoggerService) {}
@@ -18,10 +24,11 @@ export class LoggerInterceptor implements NestInterceptor {
     context: ExecutionContext,
     next: CallHandler<any>,
   ): Promise<Observable<any>> {
-    const request = this.getRequest(context);
+    const request = ContextUtil.getRequest(context);
 
     const userAgent = request.get('user-agent');
     const { ip, method, url, body, query, params } = request;
+
     const className = context.getClass().name;
     const handlerName = context.getHandler().name;
 
@@ -32,7 +39,7 @@ export class LoggerInterceptor implements NestInterceptor {
       ip,
       method,
       url,
-      body,
+      body: body,
       query,
       params,
       username,
@@ -44,25 +51,13 @@ export class LoggerInterceptor implements NestInterceptor {
       tap(async (res) => {
         await this.loggerService.update({
           where: { id: log.id },
-          data: { response: res },
+          data: {
+            response: this.blackListedMethods.includes(handlerName)
+              ? undefined
+              : res,
+          },
         });
       }),
     );
   }
-
-  private getRequest(context: ExecutionContext) {
-    if (context.getType() === 'http')
-      return context.switchToHttp().getRequest();
-
-    if (context.getType<GqlContextType>() === 'graphql')
-      return GqlExecutionContext.create(context).getContext().req;
-  }
-
-  // private getResponse(context: ExecutionContext) {
-  //   if (context.getType() === 'http')
-  //     return context.switchToHttp().getResponse();
-
-  //   if (context.getType<GqlContextType>() === 'graphql')
-  //     return GqlExecutionContext.create(context).getContext().res;
-  // }
 }
